@@ -1,16 +1,33 @@
 @import "tailwindcss";
 
-/* ─── CSS Custom Properties ─────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Base Color Scheme & Defaults ───────────────────────────── */
 :root {
+  color-scheme: light;
   --color-primary: oklch(0.6 0.2 250);
   --color-primary-hover: oklch(0.52 0.22 250);
   --scrollbar-thumb: oklch(0.75 0.02 250);
   --scrollbar-track: oklch(0.94 0.01 250);
 }
 
-.dark {
+html.dark {
+  color-scheme: dark;
   --scrollbar-thumb: oklch(0.45 0.03 250);
   --scrollbar-track: oklch(0.22 0.02 250);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #0f172a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #0f172a;
+  color: #f8fafc;
 }
 
 /* ─── Custom scrollbar ──────────────────────────────────────── */

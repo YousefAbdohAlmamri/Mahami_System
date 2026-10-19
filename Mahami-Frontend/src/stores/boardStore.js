@@ -52,12 +52,12 @@ export const useBoardStore = defineStore('board', () => {
     const response = await boardService.updateBoard(id, data)
     const updated = response.data
 
-    const index = boards.value.findIndex((b) => b.id === id)
+    const index = boards.value.findIndex((b) => String(b.id) === String(id))
     if (index !== -1) {
       boards.value[index] = { ...boards.value[index], ...updated }
     }
 
-    if (currentBoard.value && currentBoard.value.id === id) {
+    if (currentBoard.value && String(currentBoard.value.id) === String(id)) {
       currentBoard.value = { ...currentBoard.value, ...updated }
     }
 
@@ -66,8 +66,8 @@ export const useBoardStore = defineStore('board', () => {
 
   async function deleteBoard(id) {
     await boardService.deleteBoard(id)
-    boards.value = boards.value.filter((b) => b.id !== id)
-    if (currentBoard.value && currentBoard.value.id === id) {
+    boards.value = boards.value.filter((b) => String(b.id) !== String(id))
+    if (currentBoard.value && String(currentBoard.value.id) === String(id)) {
       currentBoard.value = null
     }
   }
@@ -77,7 +77,7 @@ export const useBoardStore = defineStore('board', () => {
     const response = await listService.createList(boardId, data)
     const newList = { ...response.data, tasks: [] }
 
-    if (currentBoard.value && currentBoard.value.id === boardId) {
+    if (currentBoard.value && String(currentBoard.value.id) === String(boardId)) {
       if (!currentBoard.value.lists) currentBoard.value.lists = []
       currentBoard.value.lists.push(newList)
     }
@@ -90,7 +90,7 @@ export const useBoardStore = defineStore('board', () => {
     const updated = response.data
 
     if (currentBoard.value?.lists) {
-      const list = currentBoard.value.lists.find((l) => l.id === listId)
+      const list = currentBoard.value.lists.find((l) => String(l.id) === String(listId))
       if (list) {
         list.title = updated.title
       }
@@ -103,7 +103,7 @@ export const useBoardStore = defineStore('board', () => {
     await listService.deleteList(listId)
 
     if (currentBoard.value?.lists) {
-      currentBoard.value.lists = currentBoard.value.lists.filter((l) => l.id !== listId)
+      currentBoard.value.lists = currentBoard.value.lists.filter((l) => String(l.id) !== String(listId))
     }
   }
 
@@ -111,7 +111,7 @@ export const useBoardStore = defineStore('board', () => {
     const response = await listService.reorderLists(boardId, orderedIds)
     const reordered = response.data
 
-    if (currentBoard.value && currentBoard.value.id === boardId) {
+    if (currentBoard.value && String(currentBoard.value.id) === String(boardId)) {
       // Re-map tasks preserving existing state
       const taskMap = new Map()
       currentBoard.value.lists.forEach((l) => {
@@ -133,7 +133,7 @@ export const useBoardStore = defineStore('board', () => {
     const newTask = response.data
 
     if (currentBoard.value?.lists) {
-      const list = currentBoard.value.lists.find((l) => l.id === listId)
+      const list = currentBoard.value.lists.find((l) => String(l.id) === String(listId))
       if (list) {
         if (!list.tasks) list.tasks = []
         list.tasks.push(newTask)
@@ -149,7 +149,7 @@ export const useBoardStore = defineStore('board', () => {
 
     if (currentBoard.value?.lists) {
       for (const list of currentBoard.value.lists) {
-        const taskIndex = list.tasks?.findIndex((t) => t.id === taskId) ?? -1
+        const taskIndex = list.tasks?.findIndex((t) => String(t.id) === String(taskId)) ?? -1
         if (taskIndex !== -1) {
           list.tasks[taskIndex] = { ...list.tasks[taskIndex], ...updated }
           break
@@ -165,7 +165,7 @@ export const useBoardStore = defineStore('board', () => {
 
     if (currentBoard.value?.lists) {
       for (const list of currentBoard.value.lists) {
-        const taskIndex = list.tasks?.findIndex((t) => t.id === taskId) ?? -1
+        const taskIndex = list.tasks?.findIndex((t) => String(t.id) === String(taskId)) ?? -1
         if (taskIndex !== -1) {
           list.tasks.splice(taskIndex, 1)
           // Re-index remaining positions
@@ -195,7 +195,7 @@ export const useBoardStore = defineStore('board', () => {
     const reordered = response.data
 
     if (currentBoard.value?.lists) {
-      const list = currentBoard.value.lists.find((l) => l.id === listId)
+      const list = currentBoard.value.lists.find((l) => String(l.id) === String(listId))
       if (list) {
         list.tasks = reordered
       }

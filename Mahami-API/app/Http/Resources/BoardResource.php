@@ -22,7 +22,9 @@ class BoardResource extends JsonResource
             'user_id' => $this->user_id,
             'title' => $this->title,
             'description' => $this->description,
-            'lists_count' => $this->whenCounted('lists', (int) $this->lists_count),
+            'lists_count' => $this->lists_count !== null
+                ? (int) $this->lists_count
+                : ($this->relationLoaded('lists') ? $this->lists->count() : 0),
             'lists' => BoardListResource::collection($this->whenLoaded('lists')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),

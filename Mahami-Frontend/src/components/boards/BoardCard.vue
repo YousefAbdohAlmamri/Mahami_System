@@ -13,7 +13,7 @@ const emit = defineEmits(['edit', 'delete'])
 const { t } = useI18n()
 
 const columnsCount = computed(() => {
-  const count = props.board.lists?.length || 0
+  const count = props.board.lists_count ?? props.board.lists?.length ?? 0
   return t('columnsCount', { count })
 })
 </script>
