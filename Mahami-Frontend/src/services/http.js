@@ -12,12 +12,26 @@ export const http = axios.create({
   },
 })
 
-// Request interceptor: attach bearer token if present
+function getCookie(name) {
+  if (typeof document === 'undefined') return null
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift())
+  return null
+}
+
+// Request interceptor: attach bearer token and CSRF token if present
 http.interceptors.request.use((config) => {
   const token = localStorage.getItem('mini_trello_token')
   if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`
   }
+
+  const xsrfToken = getCookie('XSRF-TOKEN')
+  if (xsrfToken && !config.headers['X-XSRF-TOKEN']) {
+    config.headers['X-XSRF-TOKEN'] = xsrfToken
+  }
+
   return config
 })
 
