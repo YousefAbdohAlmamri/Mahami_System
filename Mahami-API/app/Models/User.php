@@ -47,4 +47,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the boards owned by the user.
+     */
+    public function boards(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Board::class)->latest();
+    }
 }
