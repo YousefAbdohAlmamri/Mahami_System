@@ -29,3 +29,4 @@ class StoreTaskRequest extends FormRequest
         ];
     }
 }
+

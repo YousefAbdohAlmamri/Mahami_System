@@ -1,5 +1,50 @@
 @import "tailwindcss";
 
+/* ─── CSS Custom Properties ─────────────────────────────────── */
 :root {
-  --color-primary: #3b82f6;
+  --color-primary: oklch(0.6 0.2 250);
+  --color-primary-hover: oklch(0.52 0.22 250);
+  --scrollbar-thumb: oklch(0.75 0.02 250);
+  --scrollbar-track: oklch(0.94 0.01 250);
+}
+
+.dark {
+  --scrollbar-thumb: oklch(0.45 0.03 250);
+  --scrollbar-track: oklch(0.22 0.02 250);
+}
+
+/* ─── Custom scrollbar ──────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* ─── Smooth transitions for theme switching ─────────────────── */
+html {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ─── Drag & Drop cursor ────────────────────────────────────── */
+.sortable-ghost {
+  opacity: 0.4;
+}
+
+.sortable-drag {
+  cursor: grabbing !important;
+}
+
+/* ─── Line-clamp utility (2 lines) ──────────────────────────── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ─── Focus ring override for accessibility ─────────────────── */
+:focus-visible {
+  outline: 2px solid oklch(0.6 0.2 250);
+  outline-offset: 2px;
 }

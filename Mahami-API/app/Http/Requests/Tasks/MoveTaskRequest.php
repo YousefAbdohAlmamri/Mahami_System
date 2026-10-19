@@ -52,3 +52,4 @@ class MoveTaskRequest extends FormRequest
         });
     }
 }
+
