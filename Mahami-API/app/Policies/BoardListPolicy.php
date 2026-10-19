@@ -48,3 +48,4 @@ class BoardListPolicy
         return (int) $user->id === (int) $board->user_id;
     }
 }
+

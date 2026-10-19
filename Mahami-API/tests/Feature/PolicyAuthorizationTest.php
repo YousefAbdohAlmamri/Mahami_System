@@ -94,3 +94,4 @@ class PolicyAuthorizationTest extends TestCase
         $this->assertFalse($policy->move($stranger, $task, $strangerList));
     }
 }
+

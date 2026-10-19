@@ -47,3 +47,4 @@ class BoardPolicy
         return (int) $user->id === (int) $board->user_id;
     }
 }
+

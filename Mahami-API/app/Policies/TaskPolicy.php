@@ -60,3 +60,4 @@ class TaskPolicy
         return (int) $user->id === (int) $list->board->user_id;
     }
 }
+
