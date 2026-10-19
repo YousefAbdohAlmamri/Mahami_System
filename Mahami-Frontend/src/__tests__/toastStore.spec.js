@@ -35,3 +35,4 @@ describe('toastStore', () => {
     expect(toastStore.toasts.length).toBe(0)
   })
 })
+

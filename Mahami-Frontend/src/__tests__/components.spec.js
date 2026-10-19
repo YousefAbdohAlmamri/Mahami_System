@@ -61,3 +61,4 @@ describe('Common Components', () => {
     expect(wrapper.emitted('click')[0]).toEqual([task])
   })
 })
+

@@ -23,3 +23,4 @@ const { t } = useI18n()
     </router-link>
   </div>
 </template>
+

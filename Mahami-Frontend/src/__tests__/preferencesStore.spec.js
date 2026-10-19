@@ -43,3 +43,4 @@ describe('preferencesStore', () => {
     expect(prefs.isDark).toBe(false)
   })
 })
+

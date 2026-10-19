@@ -34,3 +34,4 @@ describe('useI18n composable', () => {
     expect(t('non_existent_key_xyz')).toBe('non_existent_key_xyz')
   })
 })
+

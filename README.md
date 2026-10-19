@@ -224,3 +224,4 @@ Test coverage includes:
 | `DELETE` | `/api/tasks/{task}` | Delete task | Yes |
 | `POST` | `/api/tasks/{task}/move` | Move task to list and position | Yes |
 | `POST` | `/api/lists/{list}/tasks/reorder` | Reorder tasks in list | Yes |
+
