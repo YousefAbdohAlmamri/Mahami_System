@@ -29,3 +29,4 @@ class BoardListResource extends JsonResource
         ];
     }
 }
+

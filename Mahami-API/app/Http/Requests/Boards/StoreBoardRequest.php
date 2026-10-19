@@ -27,3 +27,4 @@ class StoreBoardRequest extends FormRequest
         ];
     }
 }
+

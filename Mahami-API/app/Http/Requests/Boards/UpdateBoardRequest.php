@@ -27,3 +27,4 @@ class UpdateBoardRequest extends FormRequest
         ];
     }
 }
+

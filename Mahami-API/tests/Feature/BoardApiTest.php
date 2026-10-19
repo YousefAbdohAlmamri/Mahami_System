@@ -203,3 +203,4 @@ class BoardApiTest extends TestCase
         $this->assertDatabaseHas('boards', ['id' => $board->id]);
     }
 }
+

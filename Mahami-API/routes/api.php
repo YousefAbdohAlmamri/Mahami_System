@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BoardController;
+use App\Http\Controllers\Api\BoardListController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,4 +24,14 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::apiResource('boards', BoardController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | List / Column Management Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/boards/{board}/lists', [BoardListController::class, 'store']);
+    Route::put('/lists/{list}', [BoardListController::class, 'update']);
+    Route::delete('/lists/{list}', [BoardListController::class, 'destroy']);
+    Route::patch('/boards/{board}/lists/reorder', [BoardListController::class, 'reorder']);
 });
