@@ -55,3 +55,4 @@ class ReorderBoardListsRequest extends FormRequest
         });
     }
 }
+

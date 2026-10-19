@@ -186,3 +186,4 @@ class BoardListApiTest extends TestCase
         $response->assertStatus(403);
     }
 }
+

@@ -80,3 +80,4 @@ class BoardListController extends Controller
         return BoardListResource::collection($orderedLists);
     }
 }
+

@@ -26,3 +26,4 @@ class UpdateBoardListRequest extends FormRequest
         ];
     }
 }
+
