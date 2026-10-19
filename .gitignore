@@ -1,0 +1,29 @@
+# Project root gitignore
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Backend
+Mahami-API/vendor/
+Mahami-API/.env
+Mahami-API/.env.backup
+Mahami-API/.env.production
+Mahami-API/storage/*.key
+Mahami-API/storage/logs/*
+!Mahami-API/storage/logs/.gitignore
+Mahami-API/storage/framework/cache/*
+!Mahami-API/storage/framework/cache/.gitignore
+Mahami-API/storage/framework/sessions/*
+!Mahami-API/storage/framework/sessions/.gitignore
+Mahami-API/storage/framework/views/*
+!Mahami-API/storage/framework/views/.gitignore
+Mahami-API/bootstrap/cache/*
+!Mahami-API/bootstrap/cache/.gitignore
+
+# Frontend
+Mahami-Frontend/node_modules/
+Mahami-Frontend/dist/
+Mahami-Frontend/.env
+Mahami-Frontend/.env.local
+Mahami-Frontend/.env.*.local
