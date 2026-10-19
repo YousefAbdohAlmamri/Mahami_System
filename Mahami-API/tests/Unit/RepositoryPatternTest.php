@@ -147,3 +147,4 @@ class RepositoryPatternTest extends TestCase
         $this->assertEquals(1, $t2->fresh()->position);
     }
 }
+

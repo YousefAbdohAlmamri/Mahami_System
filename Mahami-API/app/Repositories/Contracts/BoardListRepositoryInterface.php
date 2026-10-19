@@ -66,3 +66,4 @@ interface BoardListRepositoryInterface
      */
     public function getNextPosition(int $boardId): int;
 }
+

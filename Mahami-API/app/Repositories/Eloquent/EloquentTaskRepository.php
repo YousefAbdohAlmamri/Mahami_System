@@ -123,3 +123,4 @@ class EloquentTaskRepository implements TaskRepositoryInterface
         return is_null($max) ? 0 : (int) $max + 1;
     }
 }
+

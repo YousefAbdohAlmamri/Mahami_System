@@ -68,3 +68,4 @@ class EloquentBoardListRepository implements BoardListRepositoryInterface
         return is_null($max) ? 0 : (int) $max + 1;
     }
 }
+

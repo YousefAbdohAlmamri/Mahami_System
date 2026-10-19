@@ -47,3 +47,4 @@ class Task extends Model
         return $this->belongsTo(BoardList::class, 'board_list_id');
     }
 }
+

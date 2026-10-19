@@ -58,3 +58,4 @@ interface BoardRepositoryInterface
      */
     public function delete(Board $board): bool;
 }
+

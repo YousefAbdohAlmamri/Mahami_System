@@ -63,3 +63,4 @@ class DatabaseConstraintsTest extends TestCase
         $this->assertIsInt($task->position);
     }
 }
+

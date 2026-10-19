@@ -60,3 +60,4 @@ class EloquentBoardRepository implements BoardRepositoryInterface
         return (bool) $board->delete();
     }
 }
+

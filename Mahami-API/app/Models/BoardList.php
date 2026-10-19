@@ -59,3 +59,4 @@ class BoardList extends Model
         return $this->hasMany(Task::class)->orderBy('position');
     }
 }
+

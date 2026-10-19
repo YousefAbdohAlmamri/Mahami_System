@@ -74,3 +74,4 @@ interface TaskRepositoryInterface
      */
     public function getNextPosition(int $listId): int;
 }
+

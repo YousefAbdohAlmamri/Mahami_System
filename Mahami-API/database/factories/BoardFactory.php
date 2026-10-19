@@ -27,3 +27,4 @@ class BoardFactory extends Factory
         ];
     }
 }
+
