@@ -122,3 +122,4 @@ describe('workspaceStore', () => {
     expect(store.currentWorkspaceId).toBe(2)
   })
 })
+

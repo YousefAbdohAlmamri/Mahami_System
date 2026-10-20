@@ -3,7 +3,10 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BoardController;
 use App\Http\Controllers\Api\BoardListController;
+use App\Http\Controllers\Api\BoardTeamController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\TeamController;
+use App\Http\Controllers\Api\TeamMemberController;
 use App\Http\Controllers\Api\WorkspaceController;
 use App\Http\Controllers\Api\WorkspaceInvitationController;
 use App\Http\Controllers\Api\WorkspaceMemberController;
@@ -45,10 +48,32 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Team Management Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/workspaces/{workspace}/teams', [TeamController::class, 'index']);
+    Route::post('/workspaces/{workspace}/teams', [TeamController::class, 'store']);
+    Route::get('/teams/{team}', [TeamController::class, 'show']);
+    Route::put('/teams/{team}', [TeamController::class, 'update']);
+    Route::delete('/teams/{team}', [TeamController::class, 'destroy']);
+
+    Route::get('/teams/{team}/members', [TeamMemberController::class, 'index']);
+    Route::post('/teams/{team}/members', [TeamMemberController::class, 'store']);
+    Route::put('/teams/{team}/members/{user}', [TeamMemberController::class, 'update']);
+    Route::delete('/teams/{team}/members/{user}', [TeamMemberController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
     | Board Management Routes
     |--------------------------------------------------------------------------
     */
     Route::apiResource('boards', BoardController::class);
+
+    // Board Teams & Permissions
+    Route::get('/boards/{board}/teams', [BoardTeamController::class, 'index']);
+    Route::post('/boards/{board}/teams', [BoardTeamController::class, 'store']);
+    Route::put('/boards/{board}/teams/{team}', [BoardTeamController::class, 'update']);
+    Route::delete('/boards/{board}/teams/{team}', [BoardTeamController::class, 'destroy']);
 
     /*
     |--------------------------------------------------------------------------

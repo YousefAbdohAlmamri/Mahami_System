@@ -10,6 +10,7 @@ import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import AppButton from '@/components/common/AppButton.vue'
+import TeamsOverviewModal from '@/components/teams/TeamsOverviewModal.vue'
 
 const boardStore = useBoardStore()
 const workspaceStore = useWorkspaceStore()
@@ -20,6 +21,7 @@ const searchQuery = ref('')
 const showFormModal = ref(false)
 const selectedBoard = ref(null)
 const isSubmitting = ref(false)
+const showTeamsModal = ref(false)
 
 const showDeleteConfirm = ref(false)
 const boardToDelete = ref(null)
@@ -145,6 +147,13 @@ async function handleDeleteBoard() {
           <span class="text-xs text-slate-500 dark:text-slate-400 font-medium me-1">
             {{ workspaceStore.currentWorkspace.members_count || 1 }} {{ t('members') }}
           </span>
+          <button
+            type="button"
+            class="px-2.5 py-1 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
+            @click="showTeamsModal = true"
+          >
+            {{ t('teams') }}
+          </button>
         </div>
       </div>
 
@@ -294,6 +303,13 @@ async function handleDeleteBoard() {
       :loading="isDeleting"
       @confirm="handleDeleteBoard"
       @cancel="showDeleteConfirm = false"
+    />
+
+    <!-- Teams Overview Modal -->
+    <TeamsOverviewModal
+      v-if="showTeamsModal && workspaceStore.currentWorkspace"
+      :workspace="workspaceStore.currentWorkspace"
+      @close="showTeamsModal = false"
     />
   </div>
 </template>

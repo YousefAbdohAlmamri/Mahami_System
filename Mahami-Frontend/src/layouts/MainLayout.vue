@@ -8,6 +8,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useToast } from '@/composables/useToast'
 import WorkspaceModal from '@/components/workspaces/WorkspaceModal.vue'
 import WorkspaceMembersModal from '@/components/workspaces/WorkspaceMembersModal.vue'
+import TeamsOverviewModal from '@/components/teams/TeamsOverviewModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 
 const router = useRouter()
@@ -25,6 +26,7 @@ const workspaceToEdit = ref(null)
 const isWorkspaceSubmitting = ref(false)
 
 const showMembersModal = ref(false)
+const showTeamsModal = ref(false)
 const showDeleteConfirm = ref(false)
 const isWorkspaceDeleting = ref(false)
 
@@ -57,6 +59,11 @@ function openEditWorkspace() {
 
 function openMembersModal() {
   showMembersModal.value = true
+  workspaceMenuOpen.value = false
+}
+
+function openTeamsModal() {
+  showTeamsModal.value = true
   workspaceMenuOpen.value = false
 }
 
@@ -216,6 +223,17 @@ async function handleLogout() {
                 <span>{{ t('members') }}</span>
               </button>
 
+              <!-- Manage Teams (if active workspace) -->
+              <button
+                v-if="workspaceStore.currentWorkspace"
+                type="button"
+                class="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors cursor-pointer"
+                @click="openTeamsModal"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>{{ t('teams') }}</span>
+              </button>
+
               <!-- Workspace Settings (if owner or admin) -->
               <button
                 v-if="workspaceStore.canEditWorkspace"
@@ -366,6 +384,13 @@ async function handleLogout() {
     v-if="showMembersModal && workspaceStore.currentWorkspace"
     :workspace="workspaceStore.currentWorkspace"
     @close="showMembersModal = false"
+  />
+
+  <!-- Workspace Teams Modal -->
+  <TeamsOverviewModal
+    v-if="showTeamsModal && workspaceStore.currentWorkspace"
+    :workspace="workspaceStore.currentWorkspace"
+    @close="showTeamsModal = false"
   />
 
   <!-- Confirm Delete Workspace Dialog -->

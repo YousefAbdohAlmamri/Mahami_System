@@ -59,6 +59,14 @@ class Workspace extends Model
     }
 
     /**
+     * Teams belonging to this workspace.
+     */
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
+    }
+
+    /**
      * Check if a specific user has a specific role in this workspace.
      */
     public function hasMemberRole(User $user, array|string $roles): bool

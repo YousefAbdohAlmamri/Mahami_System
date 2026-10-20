@@ -73,4 +73,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Workspace::class, 'owner_id');
     }
+
+    /**
+     * Teams the user is a member of.
+     */
+    public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Team::class, 'team_members', 'user_id', 'team_id')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 }

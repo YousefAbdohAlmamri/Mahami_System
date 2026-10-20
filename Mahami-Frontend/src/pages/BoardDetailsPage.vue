@@ -11,6 +11,7 @@ import ColumnForm from '@/components/lists/ColumnForm.vue'
 import TaskForm from '@/components/tasks/TaskForm.vue'
 import TaskDetailsModal from '@/components/tasks/TaskDetailsModal.vue'
 import BoardForm from '@/components/boards/BoardForm.vue'
+import BoardTeamsModal from '@/components/teams/BoardTeamsModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import AppButton from '@/components/common/AppButton.vue'
@@ -44,6 +45,7 @@ const selectedTaskForDetails = ref(null)
 
 const showEditBoardModal = ref(false)
 const isSubmittingBoard = ref(false)
+const showBoardTeamsModal = ref(false)
 
 const showDeleteConfirm = ref(false)
 const deleteAction = ref({ type: '', item: null, title: '', message: '' })
@@ -313,6 +315,21 @@ async function executeDelete() {
 
       <!-- Actions -->
       <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        <!-- Board Teams & Permissions -->
+        <button
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          :title="t('boardTeams')"
+          @click="showBoardTeamsModal = true"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span class="hidden md:inline">{{ t('teams') }}</span>
+        </button>
+
         <button
           class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           :title="t('editBoard')"
@@ -416,6 +433,13 @@ async function executeDelete() {
       :loading="isSubmittingBoard"
       @save="handleUpdateBoard"
       @close="showEditBoardModal = false"
+    />
+
+    <!-- Board Teams & Permissions Modal -->
+    <BoardTeamsModal
+      v-if="showBoardTeamsModal && boardStore.currentBoard"
+      :board="boardStore.currentBoard"
+      @close="showBoardTeamsModal = false"
     />
 
     <ConfirmDialog

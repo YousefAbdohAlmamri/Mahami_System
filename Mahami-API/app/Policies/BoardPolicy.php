@@ -25,10 +25,8 @@ class BoardPolicy
         }
 
         if ($board->workspace_id && $board->workspace) {
-            return $board->workspace->members()
-                ->where('users.id', $user->id)
-                ->where('status', 'active')
-                ->exists();
+            $perm = $board->getUserPermission($user);
+            return $perm !== null;
         }
 
         return false;
@@ -52,7 +50,10 @@ class BoardPolicy
         }
 
         if ($board->workspace_id && $board->workspace) {
-            return $board->workspace->hasMemberRole($user, ['owner', 'admin']);
+            if ($board->workspace->hasMemberRole($user, ['owner', 'admin'])) {
+                return true;
+            }
+            return $board->getUserPermission($user) === 'admin';
         }
 
         return false;
@@ -73,5 +74,12 @@ class BoardPolicy
 
         return false;
     }
-}
 
+    /**
+     * Determine whether the user can manage team assignments on this board.
+     */
+    public function manageTeams(User $user, Board $board): bool
+    {
+        return $this->update($user, $board);
+    }
+}
