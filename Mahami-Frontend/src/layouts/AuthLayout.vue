@@ -18,7 +18,7 @@ const { t } = useI18n()
     <!-- Language & theme toggles (top corner) -->
     <div class="fixed top-3 end-3 sm:top-5 sm:end-6 flex items-center gap-2 z-10">
       <button
-        class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-750 transition-all shadow-xs cursor-pointer active:scale-95"
+        class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-xs cursor-pointer active:scale-95"
         :title="t('language')"
         @click="prefs.toggleLocale()"
       >
@@ -33,7 +33,7 @@ const { t } = useI18n()
       </button>
 
       <button
-        class="p-2 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-750 transition-all shadow-xs cursor-pointer active:scale-95"
+        class="p-2 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-xs cursor-pointer active:scale-95"
         :title="prefs.isDark ? t('lightMode') : t('darkMode')"
         @click="prefs.toggleTheme()"
       >

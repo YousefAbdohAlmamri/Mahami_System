@@ -46,7 +46,7 @@ const isOverdue = computed(() => {
 <template>
   <div
     :data-task-id="task.id"
-    class="task-item group relative bg-white dark:bg-slate-850 p-4 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 shadow-2xs hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 hover:-translate-y-0.5 transition-all duration-150 cursor-grab active:cursor-grabbing select-none"
+    class="task-item group relative bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 shadow-2xs hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 hover:-translate-y-0.5 transition-all duration-150 cursor-grab active:cursor-grabbing select-none"
     @click="emit('click', task)"
   >
     <!-- Priority badge + quick actions -->
@@ -63,7 +63,7 @@ const isOverdue = computed(() => {
 
       <div class="flex items-center gap-1 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
-          class="p-1 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors cursor-pointer"
+          class="p-1 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           :title="t('editTask')"
           @click.stop="emit('edit', task)"
         >
@@ -99,7 +99,7 @@ const isOverdue = computed(() => {
     <!-- Footer metadata (Due Date) -->
     <div
       v-if="formattedDueDate"
-      class="flex items-center gap-1.5 text-[11px] pt-2.5 border-t border-slate-100 dark:border-slate-800"
+      class="flex items-center gap-1.5 text-[11px] pt-2.5 border-t border-slate-100 dark:border-slate-700/60"
       :class="isOverdue ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-slate-500 dark:text-slate-400'"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

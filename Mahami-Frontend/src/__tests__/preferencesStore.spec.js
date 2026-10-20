@@ -33,14 +33,22 @@ describe('preferencesStore', () => {
 
   it('toggles theme between light and dark', () => {
     const prefs = usePreferencesStore()
+    expect(document.documentElement.classList.contains('dark')).toBe(false)
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+
     prefs.toggleTheme()
     expect(prefs.theme).toBe('dark')
     expect(prefs.isDark).toBe(true)
     expect(localStorage.getItem('mini_trello_theme')).toBe('dark')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
 
     prefs.toggleTheme()
     expect(prefs.theme).toBe('light')
     expect(prefs.isDark).toBe(false)
+    expect(localStorage.getItem('mini_trello_theme')).toBe('light')
+    expect(document.documentElement.classList.contains('dark')).toBe(false)
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
   })
 })
 

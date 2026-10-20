@@ -10,8 +10,16 @@ export const usePreferencesStore = defineStore('preferences', () => {
   const dir = computed(() => (isRtl.value ? 'rtl' : 'ltr'))
 
   // 2. Theme (light / dark)
-  const savedTheme = localStorage.getItem('mini_trello_theme') || 'light'
-  const theme = ref(savedTheme)
+  const getInitialTheme = () => {
+    const saved = localStorage.getItem('mini_trello_theme')
+    if (saved === 'dark' || saved === 'light') return saved
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark'
+    }
+    return 'light'
+  }
+
+  const theme = ref(getInitialTheme())
   const isDark = computed(() => theme.value === 'dark')
 
   // Apply DOM side effects
@@ -22,8 +30,10 @@ export const usePreferencesStore = defineStore('preferences', () => {
 
       if (theme.value === 'dark') {
         document.documentElement.classList.add('dark')
+        document.documentElement.setAttribute('data-theme', 'dark')
       } else {
         document.documentElement.classList.remove('dark')
+        document.documentElement.setAttribute('data-theme', 'light')
       }
     }
   }

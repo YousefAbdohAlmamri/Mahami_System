@@ -82,8 +82,8 @@ onBeforeUnmount(() => {
         <div
           ref="modalEl"
           :class="[
-            'relative w-full bg-white dark:bg-slate-850 rounded-2xl sm:rounded-3xl shadow-2xl z-10',
-            'border border-slate-200/80 dark:border-slate-700/80',
+            'relative w-full bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl z-10',
+            'border border-slate-200/80 dark:border-slate-700',
             'flex flex-col max-h-[92vh] sm:max-h-[90vh]',
             sizeClasses[size],
           ]"
@@ -91,14 +91,14 @@ onBeforeUnmount(() => {
           <!-- Header -->
           <div
             v-if="title || $slots.header"
-            class="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0"
+            class="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-700/80 shrink-0"
           >
             <slot name="header">
               <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">{{ title }}</h2>
             </slot>
             <button
               data-close
-              class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors -me-1 cursor-pointer"
+              class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors -me-1 cursor-pointer"
               @click="close"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
           <!-- Footer -->
           <div
             v-if="$slots.footer"
-            class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 rounded-b-2xl sm:rounded-b-3xl shrink-0"
+            class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-b-2xl sm:rounded-b-3xl shrink-0"
           >
             <slot name="footer" />
           </div>

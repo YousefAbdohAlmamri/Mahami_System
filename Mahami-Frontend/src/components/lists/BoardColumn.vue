@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     :data-list-id="list.id"
-    class="board-column-item flex flex-col w-[84vw] max-w-[290px] sm:w-80 sm:max-w-none shrink-0 bg-slate-100/90 dark:bg-slate-800/90 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs max-h-[calc(100vh-8.5rem)] sm:max-h-full overflow-hidden transition-shadow"
+    class="board-column-item flex flex-col w-[84vw] max-w-[290px] sm:w-80 sm:max-w-none shrink-0 bg-slate-100/90 dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs max-h-[calc(100vh-8.5rem)] sm:max-h-full overflow-hidden transition-shadow"
   >
     <!-- Header -->
     <ColumnHeader
@@ -106,9 +106,9 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Add Task button -->
-    <div class="p-3 pt-1 border-t border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/50">
+    <div class="p-3 pt-1 border-t border-slate-200/60 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/50">
       <button
-        class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-700 transition-all border border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500 shadow-2xs hover:shadow-xs cursor-pointer active:scale-[0.98]"
+        class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-800 transition-all border border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 shadow-2xs hover:shadow-xs cursor-pointer active:scale-[0.98]"
         @click="emit('add-task', list.id)"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

@@ -55,7 +55,7 @@ function cancelEdit() {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-2 px-4 py-3.5 border-b border-slate-200/80 dark:border-slate-700/80 select-none">
+  <div class="flex items-center justify-between gap-2 px-4 py-3.5 border-b border-slate-200/80 dark:border-slate-800 select-none">
     <!-- Drag handle + Title -->
     <div class="flex items-center gap-2 flex-1 min-w-0">
       <div
@@ -79,7 +79,7 @@ function cancelEdit() {
         <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
           {{ list.title }}
         </h3>
-        <span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 font-semibold shrink-0">
+        <span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold shrink-0">
           {{ taskCount }}
         </span>
       </div>
@@ -88,7 +88,7 @@ function cancelEdit() {
         v-else
         ref="inputEl"
         v-model="titleInput"
-        class="text-sm font-bold px-2 py-1 rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white w-full outline-none shadow-xs"
+        class="text-sm font-bold px-2 py-1 rounded-lg border-2 border-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white w-full outline-none shadow-xs"
         @blur="saveEdit"
         @keydown.enter="saveEdit"
         @keydown.esc="cancelEdit"
@@ -99,7 +99,7 @@ function cancelEdit() {
     <div class="flex items-center gap-0.5 shrink-0">
       <button
         v-if="!isEditing"
-        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-700 transition-colors cursor-pointer"
+        class="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer"
         :title="t('editColumn')"
         @click="startEdit"
       >

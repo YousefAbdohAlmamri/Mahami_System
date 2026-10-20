@@ -53,7 +53,7 @@ async function handleLogout() {
       <div class="flex items-center gap-2">
         <!-- Language toggle -->
         <button
-          class="px-2.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
+          class="px-2.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
           :title="t('language')"
           @click="prefs.toggleLocale()"
         >
@@ -69,7 +69,7 @@ async function handleLogout() {
 
         <!-- Theme toggle -->
         <button
-          class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
+          class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-2xs hover:shadow-xs cursor-pointer active:scale-95"
           :title="prefs.isDark ? t('lightMode') : t('darkMode')"
           @click="prefs.toggleTheme()"
         >
