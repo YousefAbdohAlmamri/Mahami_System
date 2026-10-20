@@ -79,6 +79,8 @@ async function handleSubmit() {
       if (serverErrors.email) errors.email = serverErrors.email[0]
       if (serverErrors.password) errors.password = serverErrors.password[0]
       if (serverErrors.password_confirmation) errors.password_confirmation = serverErrors.password_confirmation[0]
+    } else if (!err.response) {
+      errors.general = t('networkError')
     } else {
       errors.general = err.response?.data?.message || t('genericError')
     }

@@ -70,8 +70,11 @@ class AuthController extends Controller
         $user = $request->user();
 
         if ($user) {
-            // Revoke current token if using token auth
-            $user->currentAccessToken()?->delete();
+            // Revoke current token if using token auth (skip TransientToken from session)
+            $token = $user->currentAccessToken();
+            if ($token && method_exists($token, 'delete')) {
+                $token->delete();
+            }
         }
 
         Auth::guard('web')->logout();

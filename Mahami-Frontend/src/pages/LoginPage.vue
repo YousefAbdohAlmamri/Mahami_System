@@ -61,6 +61,8 @@ async function handleSubmit() {
       if (serverErrors.password) errors.password = serverErrors.password[0]
     } else if (err.response?.status === 429) {
       errors.general = err.response.data.message || t('genericError')
+    } else if (!err.response) {
+      errors.general = t('networkError')
     } else {
       errors.general = err.response?.data?.message || t('genericError')
     }
