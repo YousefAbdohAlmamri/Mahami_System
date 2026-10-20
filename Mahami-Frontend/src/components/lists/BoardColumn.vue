@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     :data-list-id="list.id"
-    class="board-column-item flex flex-col w-72 sm:w-80 shrink-0 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs max-h-full"
+    class="board-column-item flex flex-col w-[84vw] max-w-[280px] sm:w-80 sm:max-w-none shrink-0 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs max-h-[calc(100vh-8.5rem)] sm:max-h-full"
   >
     <!-- Header -->
     <ColumnHeader

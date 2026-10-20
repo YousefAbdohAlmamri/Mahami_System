@@ -285,12 +285,12 @@ async function executeDelete() {
     <!-- Top Board Toolbar -->
     <div
       v-if="boardStore.currentBoard"
-      class="h-14 shrink-0 px-4 sm:px-6 bg-white dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-4 select-none"
+      class="min-h-14 py-2 px-3 sm:px-6 bg-white dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700/80 flex items-center justify-between gap-2 sm:gap-4 select-none shrink-0"
     >
-      <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         <router-link
           :to="{ name: 'boards' }"
-          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shrink-0"
           :title="t('boards')"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -298,13 +298,13 @@ async function executeDelete() {
           </svg>
         </router-link>
 
-        <div class="min-w-0">
-          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate">
             {{ boardStore.currentBoard.title }}
           </h2>
           <p
             v-if="boardStore.currentBoard.description"
-            class="text-xs text-slate-500 dark:text-slate-400 truncate hidden sm:block"
+            class="text-xs text-slate-500 dark:text-slate-400 truncate hidden md:block"
           >
             {{ boardStore.currentBoard.description }}
           </p>
@@ -312,9 +312,9 @@ async function executeDelete() {
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
-          class="p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           :title="t('editBoard')"
           @click="showEditBoardModal = true"
         >
@@ -324,7 +324,7 @@ async function executeDelete() {
         </button>
 
         <button
-          class="p-2 rounded-lg text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+          class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
           :title="t('deleteBoard')"
           @click="confirmDeleteBoard"
         >
@@ -333,13 +333,13 @@ async function executeDelete() {
           </svg>
         </button>
 
-        <div class="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+        <div class="h-4 sm:h-5 w-px bg-slate-200 dark:bg-slate-700 mx-0.5 sm:mx-1" />
 
-        <AppButton variant="primary" size="sm" @click="openAddColumnModal">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <AppButton variant="primary" size="sm" class="px-2.5 sm:px-3" @click="openAddColumnModal">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          {{ t('addColumn') }}
+          <span class="hidden sm:inline">{{ t('addColumn') }}</span>
         </AppButton>
       </div>
     </div>
@@ -354,11 +354,11 @@ async function executeDelete() {
 
     <div
       v-else-if="boardStore.currentBoard"
-      class="flex-1 overflow-x-auto overflow-y-hidden p-4 sm:p-6"
+      class="flex-1 overflow-x-auto overflow-y-hidden p-3 sm:p-6"
     >
       <div
         ref="columnsContainer"
-        class="inline-flex items-start gap-4 h-full"
+        class="inline-flex items-start gap-3 sm:gap-4 h-full"
       >
         <BoardColumn
           v-for="list in boardStore.currentBoard.lists || []"
@@ -375,13 +375,13 @@ async function executeDelete() {
 
         <!-- Add column placeholder / action -->
         <button
-          class="w-72 sm:w-80 shrink-0 h-28 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-white dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center gap-2 font-medium text-sm transition-all duration-150"
+          class="w-[84vw] max-w-[280px] sm:w-80 shrink-0 h-24 sm:h-28 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-white dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center gap-2 font-medium text-sm transition-all duration-150"
           @click="openAddColumnModal"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 5v14M5 12h14" />
           </svg>
-          {{ t('addColumn') }}
+          <span>{{ t('addColumn') }}</span>
         </button>
       </div>
     </div>

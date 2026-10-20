@@ -47,7 +47,7 @@ const isOverdue = computed(() => {
         {{ t(task.priority) }}
       </span>
 
-      <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div class="flex items-center gap-1 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
           class="p-1 rounded text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           :title="t('editTask')"

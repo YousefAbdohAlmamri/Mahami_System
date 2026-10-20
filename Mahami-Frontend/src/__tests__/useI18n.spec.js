@@ -14,11 +14,11 @@ describe('useI18n composable', () => {
     const { t } = useI18n()
 
     // Default Arabic
-    expect(t('appName')).toBe('ميني تريلو')
+    expect(t('appName')).toBe('مهامي')
 
     // Switch to English
     prefs.setLocale('en')
-    expect(t('appName')).toBe('Mini Trello')
+    expect(t('appName')).toBe('Mahami')
   })
 
   it('interpolates params in strings', () => {

@@ -81,7 +81,7 @@ const isOverdue = computed(() => {
     </div>
 
     <template #footer>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-2">
         <AppButton
           variant="danger"
           size="sm"
@@ -93,7 +93,7 @@ const isOverdue = computed(() => {
           {{ t('delete') }}
         </AppButton>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 ms-auto">
           <AppButton
             variant="secondary"
             size="sm"

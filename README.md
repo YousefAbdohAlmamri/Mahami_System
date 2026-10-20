@@ -1,4 +1,4 @@
-# Mini Trello — Full-Stack Kanban Task Management
+# Mahami — Full-Stack Kanban Task Management
 
 A modern, production-grade Kanban-based task and project management web application inspired by Trello. Built with **Laravel 12 REST API** (PHP 8.2), **MySQL**, **Repository Pattern**, **Sanctum Authentication**, and **Vue 3** (Vite, Pinia, Vue Router, Tailwind CSS v4, Sortablejs).
 

@@ -49,7 +49,7 @@ onBeforeUnmount(() => {
   <teleport to="body">
     <!-- Backdrop -->
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -64,14 +64,14 @@ onBeforeUnmount(() => {
         ref="modalEl"
         :class="[
           'relative w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl z-10',
-          'flex flex-col max-h-[90vh]',
+          'flex flex-col max-h-[92vh] sm:max-h-[90vh]',
           sizeClasses[size],
         ]"
       >
         <!-- Header -->
         <div
           v-if="title || $slots.header"
-          class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0"
+          class="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 dark:border-slate-700 shrink-0"
         >
           <slot name="header">
             <h2 class="text-base font-semibold text-slate-900 dark:text-white">{{ title }}</h2>
@@ -86,14 +86,14 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Body -->
-        <div class="overflow-y-auto flex-1 px-6 py-4">
+        <div class="overflow-y-auto flex-1 px-4 sm:px-6 py-4">
           <slot />
         </div>
 
         <!-- Footer -->
         <div
           v-if="$slots.footer"
-          class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0"
+          class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-200 dark:border-slate-700 shrink-0"
         >
           <slot name="footer" />
         </div>

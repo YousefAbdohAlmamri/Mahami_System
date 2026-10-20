@@ -28,8 +28,8 @@ const typeConfig = {
 </script>
 
 <template>
-  <!-- Fixed container – always top-end (right in LTR, left in RTL) -->
-  <div class="fixed top-4 end-4 z-[100] flex flex-col gap-2 pointer-events-none w-80">
+  <!-- Fixed container – responsive width on mobile, top-end on desktop -->
+  <div class="fixed top-4 start-4 end-4 sm:start-auto sm:end-4 z-[100] flex flex-col gap-2 pointer-events-none sm:w-80 max-w-full">
     <transition-group
       name="toast"
       tag="div"

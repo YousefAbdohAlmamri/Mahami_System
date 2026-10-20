@@ -30,6 +30,12 @@ html.dark body {
   color: #f8fafc;
 }
 
+/* ─── Smooth scrolling & touch momentum ──────────────────────── */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 /* ─── Custom scrollbar ──────────────────────────────────────── */
 * {
   scrollbar-width: thin;

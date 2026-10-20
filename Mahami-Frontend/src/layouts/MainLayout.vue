@@ -34,8 +34,8 @@ async function handleLogout() {
         :to="{ name: 'boards' }"
         class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-lg select-none"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="10" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg>
-        Mini Trello
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="10" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/></svg>
+        <span>{{ t('appName') }}</span>
       </router-link>
 
       <div class="flex-1" />

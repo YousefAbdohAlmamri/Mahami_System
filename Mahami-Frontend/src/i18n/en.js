@@ -1,5 +1,5 @@
 export default {
-  appName: 'Mini Trello',
+  appName: 'Mahami',
   tagline: 'Modern Kanban task management for focused teams and individuals',
   
   // Auth
