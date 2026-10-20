@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Collection;
 interface BoardRepositoryInterface
 {
     /**
-     * Get all boards owned by a specific user.
+     * Get all boards accessible to a specific user, optionally filtered by workspace.
      *
      * @param int $userId
+     * @param int|null $workspaceId
      * @return Collection<int, Board>
      */
-    public function getForUser(int $userId): Collection;
+    public function getForUser(int $userId, ?int $workspaceId = null): Collection;
 
     /**
      * Find a specific board for a user by its ID.

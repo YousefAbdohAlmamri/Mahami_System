@@ -20,7 +20,18 @@ class BoardPolicy
      */
     public function view(User $user, Board $board): bool
     {
-        return (int) $user->id === (int) $board->user_id;
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id && $board->workspace) {
+            return $board->workspace->members()
+                ->where('users.id', $user->id)
+                ->where('status', 'active')
+                ->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -36,7 +47,15 @@ class BoardPolicy
      */
     public function update(User $user, Board $board): bool
     {
-        return (int) $user->id === (int) $board->user_id;
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id && $board->workspace) {
+            return $board->workspace->hasMemberRole($user, ['owner', 'admin']);
+        }
+
+        return false;
     }
 
     /**
@@ -44,7 +63,15 @@ class BoardPolicy
      */
     public function delete(User $user, Board $board): bool
     {
-        return (int) $user->id === (int) $board->user_id;
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id && $board->workspace) {
+            return (int) $board->workspace->owner_id === (int) $user->id;
+        }
+
+        return false;
     }
 }
 

@@ -81,6 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     localStorage.removeItem('mini_trello_user')
     localStorage.removeItem('mini_trello_token')
+    localStorage.removeItem('mahami_active_workspace')
   }
 
   return {

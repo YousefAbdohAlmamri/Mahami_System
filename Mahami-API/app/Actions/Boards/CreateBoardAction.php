@@ -38,6 +38,7 @@ class CreateBoardAction
         return DB::transaction(function () use ($user, $data) {
             $board = $this->boardRepository->create([
                 'user_id' => $user->id,
+                'workspace_id' => $data['workspace_id'] ?? null,
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
             ]);

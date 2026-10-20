@@ -27,7 +27,8 @@ class BoardController extends Controller
     {
         Gate::authorize('viewAny', Board::class);
 
-        $boards = $this->boardRepository->getForUser((int) $request->user()->id);
+        $workspaceId = $request->has('workspace_id') ? (int) $request->input('workspace_id') : null;
+        $boards = $this->boardRepository->getForUser((int) $request->user()->id, $workspaceId);
 
         return BoardResource::collection($boards);
     }

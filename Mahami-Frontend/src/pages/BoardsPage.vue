@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useBoardStore } from '@/stores/boardStore'
+import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { useI18n } from '@/composables/useI18n'
 import { useToast } from '@/composables/useToast'
 import BoardCard from '@/components/boards/BoardCard.vue'
@@ -11,6 +12,7 @@ import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import AppButton from '@/components/common/AppButton.vue'
 
 const boardStore = useBoardStore()
+const workspaceStore = useWorkspaceStore()
 const { t } = useI18n()
 const toast = useToast()
 
@@ -23,13 +25,31 @@ const showDeleteConfirm = ref(false)
 const boardToDelete = ref(null)
 const isDeleting = ref(false)
 
-onMounted(async () => {
+async function loadData() {
   try {
-    await boardStore.fetchBoards()
+    if (workspaceStore.workspaces.length === 0) {
+      await workspaceStore.fetchWorkspaces()
+    }
+    await boardStore.fetchBoards(workspaceStore.currentWorkspaceId)
   } catch {
     toast.error(t('networkError'))
   }
+}
+
+onMounted(() => {
+  loadData()
 })
+
+watch(
+  () => workspaceStore.currentWorkspaceId,
+  async (newId) => {
+    try {
+      await boardStore.fetchBoards(newId)
+    } catch {
+      toast.error(t('networkError'))
+    }
+  },
+)
 
 const filteredBoards = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
@@ -63,7 +83,10 @@ async function handleSaveBoard(data) {
       await boardStore.updateBoard(selectedBoard.value.id, data)
       toast.success(t('savedSuccessfully'))
     } else {
-      await boardStore.createBoard(data)
+      await boardStore.createBoard({
+        ...data,
+        workspace_id: workspaceStore.currentWorkspaceId || null,
+      })
       toast.success(t('createdSuccessfully'))
     }
     showFormModal.value = false
@@ -92,9 +115,41 @@ async function handleDeleteBoard() {
 
 <template>
   <div class="h-full overflow-y-auto px-4 sm:px-8 py-8">
-    <div class="max-w-6xl mx-auto space-y-8">
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <!-- ── Workspace Context Banner ────────────────────────── -->
+      <div
+        v-if="workspaceStore.currentWorkspace"
+        class="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/80 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
+        <div class="space-y-1">
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              {{ workspaceStore.currentWorkspace.name }}
+            </h2>
+            <span
+              v-if="workspaceStore.currentUserRole"
+              class="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+            >
+              {{ t('role' + workspaceStore.currentUserRole.charAt(0).toUpperCase() + workspaceStore.currentUserRole.slice(1)) }}
+            </span>
+          </div>
+          <p
+            v-if="workspaceStore.currentWorkspace.description"
+            class="text-xs text-slate-500 dark:text-slate-400 max-w-xl"
+          >
+            {{ workspaceStore.currentWorkspace.description }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium me-1">
+            {{ workspaceStore.currentWorkspace.members_count || 1 }} {{ t('members') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Header ─────────────────────────────────────────── -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
         <div>
           <div class="flex items-center gap-3">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -144,7 +199,11 @@ async function handleDeleteBoard() {
             </button>
           </div>
 
-          <AppButton variant="primary" @click="openCreateModal">
+          <AppButton
+            v-if="workspaceStore.canCreateBoard"
+            variant="primary"
+            @click="openCreateModal"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -166,7 +225,7 @@ async function handleDeleteBoard() {
         <p class="text-rose-600 dark:text-rose-400 font-medium mb-3 text-sm">
           {{ boardStore.error }}
         </p>
-        <AppButton variant="secondary" size="sm" @click="boardStore.fetchBoards()">
+        <AppButton variant="secondary" size="sm" @click="loadData">
           {{ t('retry') }}
         </AppButton>
       </div>
@@ -176,7 +235,7 @@ async function handleDeleteBoard() {
         <EmptyState
           :title="t('noBoards')"
           :description="t('noBoardsSubtitle')"
-          :action-text="t('createBoard')"
+          :action-text="workspaceStore.canCreateBoard ? t('createBoard') : null"
           @action="openCreateModal"
         />
       </div>
@@ -238,4 +297,3 @@ async function handleDeleteBoard() {
     />
   </div>
 </template>
-

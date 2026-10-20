@@ -19,3 +19,4 @@
 - **Context:** Modern single-page applications suffer from FOUC (flash of white screen) when dark mode is loaded via JavaScript bundles.
 - **Decision:** Embed a tiny, non-blocking inline `<script>` in `<head>` of `index.html` that inspects `localStorage` and `prefers-color-scheme` to immediately inject `.dark` and `data-theme="dark"` into `document.documentElement` before CSS parsing begins.
 - **Consequences:** Instantaneous dark mode rendering with zero screen flashing on reload.
+

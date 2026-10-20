@@ -32,6 +32,13 @@ const routes = [
     props: true,
   },
   {
+    path: '/invitations/:token',
+    name: 'accept-invitation',
+    component: () => import('@/pages/AcceptInvitationPage.vue'),
+    meta: { layout: 'main' },
+    props: true,
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/pages/NotFoundPage.vue'),

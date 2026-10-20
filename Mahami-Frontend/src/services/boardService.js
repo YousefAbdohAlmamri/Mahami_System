@@ -1,8 +1,8 @@
 import http from './http'
 
 export const boardService = {
-  async getBoards() {
-    const response = await http.get('/api/boards')
+  async getBoards(params = {}) {
+    const response = await http.get('/api/boards', { params })
     return response.data
   },
 

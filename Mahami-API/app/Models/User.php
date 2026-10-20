@@ -55,4 +55,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Board::class)->latest();
     }
+
+    /**
+     * Workspaces the user is a member of.
+     */
+    public function workspaces(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_members')
+            ->withPivot('role', 'status')
+            ->withTimestamps();
+    }
+
+    /**
+     * Workspaces owned by the user.
+     */
+    public function ownedWorkspaces(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Workspace::class, 'owner_id');
+    }
 }

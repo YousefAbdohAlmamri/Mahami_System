@@ -24,6 +24,7 @@ class StoreBoardRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
+            'workspace_id' => ['nullable', 'integer', 'exists:workspaces,id'],
         ];
     }
 }

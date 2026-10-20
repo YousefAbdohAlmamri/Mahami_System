@@ -20,9 +20,18 @@ class Board extends Model
      */
     protected $fillable = [
         'user_id',
+        'workspace_id',
         'title',
         'description',
     ];
+
+    /**
+     * Get the workspace that owns the board.
+     */
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
+    }
 
     /**
      * Get the user that owns the board.

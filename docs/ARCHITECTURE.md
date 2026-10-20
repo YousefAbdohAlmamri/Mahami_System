@@ -75,3 +75,4 @@ All bindings are registered in [`app/Providers/RepositoryServiceProvider.php`](f
 - **`boardStore`:** Handles CRUD for boards, lists, and tasks, performing optimistic client-side updates with server reconciliation on error.
 - **`preferencesStore`:** Reactive preferences for `locale` (`ar`/`en`), `dir` (`rtl`/`ltr`), and `theme` (`light`/`dark`).
 - **`toastStore`:** Dispatches auto-dismissing notifications (`success`, `error`, `warning`, `info`).
+

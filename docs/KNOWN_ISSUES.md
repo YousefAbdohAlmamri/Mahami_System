@@ -11,3 +11,4 @@
 ## 3. Email Delivery Setup (Phase 1 & 5 Consideration)
 - **Constraint:** Invitation emails and notification reminders require active SMTP/Mailgun/SES credentials in `.env`.
 - **Mitigation Strategy:** Provide a `log` or `array` driver default during testing/local development with documented environment variables, allowing invitation tokens to be retrieved directly via API response and UI link copying.
+

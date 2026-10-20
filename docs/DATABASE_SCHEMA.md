@@ -91,3 +91,4 @@
 ### Phase 5 — Real-Time Notifications
 - `notifications`: standard Laravel notification table (`id` UUID, `type`, `notifiable_type`, `notifiable_id`, `data` JSON, `read_at`, `created_at`)
 - `notification_preferences`: `id`, `user_id` (FK), `channel` (database, mail, broadcast), `event_type`, `is_enabled`
+

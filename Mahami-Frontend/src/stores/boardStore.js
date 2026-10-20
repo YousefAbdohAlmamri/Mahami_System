@@ -11,11 +11,15 @@ export const useBoardStore = defineStore('board', () => {
   const error = ref(null)
 
   // 1. Board Operations
-  async function fetchBoards() {
+  async function fetchBoards(workspaceId = null) {
     isLoading.value = true
     error.value = null
     try {
-      const response = await boardService.getBoards()
+      const params = {}
+      if (workspaceId) {
+        params.workspace_id = workspaceId
+      }
+      const response = await boardService.getBoards(params)
       boards.value = response.data || []
       return boards.value
     } catch (err) {

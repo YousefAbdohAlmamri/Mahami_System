@@ -5,16 +5,18 @@ Continue executing the Mahami Full Team & Project Management Platform implementa
 
 ## Current Baseline Status:
 - Phase 0 (Audit and Baseline) is completed and verified.
-- 58/58 Laravel backend tests passing.
-- 14/14 Vue 3 frontend tests passing.
+- Phase 1 (Workspaces and Memberships) is completed and verified:
+  - Backend: 68/68 Laravel PHPUnit tests passing (275 assertions).
+  - Frontend: 20/20 Vitest tests passing, production build compiles cleanly.
+  - Workspaces, Memberships (Owner, Admin, Member, Guest), Invitations with secure tokens and acceptance route, Workspace Switcher, and tenant board scoping are fully functional.
 - Project documentation is up-to-date in docs/ directory.
 
 ## Next Action:
-- Awaiting user approval to proceed with Phase 1 — Workspaces and Memberships.
-- When approved, implement Phase 1:
-  1. Workspace & WorkspaceMembership migrations, models, and Repository contracts.
-  2. Backward-compatible migration linking existing boards to an auto-created default workspace per user.
-  3. Workspace invitations with secure tokens, expiration, and acceptance flows.
-  4. Workspace management UI (Workspace selector, creation modal, members list, invite dialog).
-  5. Feature tests covering workspace isolation, invitations, and RBAC permissions.
+- Awaiting user approval to proceed with Phase 2 — Teams and Permissions.
+- When approved, implement Phase 2:
+  1. Teams entity scoped to workspaces (`teams`, `team_members` tables).
+  2. Team roles and board permissions (View-Only, Editor, Admin).
+  3. Team management backend (Repositories, Policies, FormRequests, Controllers, Endpoints).
+  4. Team management frontend (Store, team list, team creation/edit modals, member assignments).
+  5. Feature tests covering team isolation, role hierarchy, and board permission checks.
 ```

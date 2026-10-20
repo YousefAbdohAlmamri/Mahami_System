@@ -12,26 +12,51 @@ class EloquentBoardRepository implements BoardRepositoryInterface
         protected Board $model
     ) {}
 
-    public function getForUser(int $userId): Collection
+    public function getForUser(int $userId, ?int $workspaceId = null): Collection
     {
-        return $this->model
-            ->where('user_id', $userId)
-            ->withCount('lists')
-            ->latest()
-            ->get();
+        $query = $this->model->newQuery();
+
+        if ($workspaceId) {
+            $query->where('workspace_id', $workspaceId)
+                ->where(function ($q) use ($userId) {
+                    $q->where('user_id', $userId)
+                      ->orWhereHas('workspace.members', function ($mq) use ($userId) {
+                          $mq->where('users.id', $userId)->where('status', 'active');
+                      });
+                });
+        } else {
+            $query->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereHas('workspace.members', function ($mq) use ($userId) {
+                      $mq->where('users.id', $userId)->where('status', 'active');
+                  });
+            });
+        }
+
+        return $query->withCount('lists')->latest()->get();
     }
 
     public function findByIdForUser(int $id, int $userId): ?Board
     {
         return $this->model
-            ->where('user_id', $userId)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereHas('workspace.members', function ($mq) use ($userId) {
+                      $mq->where('users.id', $userId)->where('status', 'active');
+                  });
+            })
             ->find($id);
     }
 
     public function findWithListsAndTasks(int $id, int $userId): ?Board
     {
         return $this->model
-            ->where('user_id', $userId)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereHas('workspace.members', function ($mq) use ($userId) {
+                      $mq->where('users.id', $userId)->where('status', 'active');
+                  });
+            })
             ->with([
                 'lists' => function ($query) {
                     $query->orderBy('position')->with([
