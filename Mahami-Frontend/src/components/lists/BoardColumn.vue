@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     :data-list-id="list.id"
-    class="board-column-item flex flex-col w-[84vw] max-w-[280px] sm:w-80 sm:max-w-none shrink-0 bg-slate-100/90 dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs max-h-[calc(100vh-8.5rem)] sm:max-h-full"
+    class="board-column-item flex flex-col w-[84vw] max-w-[290px] sm:w-80 sm:max-w-none shrink-0 bg-slate-100/90 dark:bg-slate-800/90 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs max-h-[calc(100vh-8.5rem)] sm:max-h-full overflow-hidden transition-shadow"
   >
     <!-- Header -->
     <ColumnHeader
@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
     <div
       ref="tasksContainer"
       :data-list-id="list.id"
-      class="flex-1 overflow-y-auto px-3 py-2.5 flex flex-col gap-2.5 min-h-16"
+      class="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2.5 min-h-16"
     >
       <TaskCard
         v-for="task in list.tasks || []"
@@ -95,19 +95,23 @@ onBeforeUnmount(() => {
       <!-- Empty list hint -->
       <div
         v-if="!list.tasks || list.tasks.length === 0"
-        class="py-6 text-center text-xs text-slate-400 dark:text-slate-500 italic pointer-events-none select-none"
+        class="py-8 text-center text-xs text-slate-400 dark:text-slate-500 italic pointer-events-none select-none flex flex-col items-center gap-1.5"
       >
-        {{ t('noTasks') }}
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+        </svg>
+        <span>{{ t('noTasks') }}</span>
       </div>
     </div>
 
     <!-- Add Task button -->
-    <div class="p-2.5 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+    <div class="p-3 pt-1 border-t border-slate-200/60 dark:border-slate-700/60 bg-slate-100/50 dark:bg-slate-800/50">
       <button
-        class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-700/60 transition-colors border border-dashed border-slate-300 dark:border-slate-600"
+        class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-700 transition-all border border-dashed border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500 shadow-2xs hover:shadow-xs cursor-pointer active:scale-[0.98]"
         @click="emit('add-task', list.id)"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M12 5v14M5 12h14" />
         </svg>
         {{ t('addTask') }}

@@ -89,24 +89,51 @@ function handleSubmit() {
       />
 
       <!-- Priority selection -->
-      <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-slate-700 dark:text-slate-300">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 select-none">
           {{ t('priority') }}
         </label>
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-3 gap-2.5">
           <button
-            v-for="p in ['low', 'medium', 'high']"
-            :key="p"
             type="button"
-            class="px-3 py-2 text-xs font-semibold rounded-lg border transition-all text-center"
+            class="px-3 py-2 text-xs font-bold rounded-xl border transition-all text-center cursor-pointer flex items-center justify-center gap-1.5"
             :class="[
-              form.priority === p
-                ? 'border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:border-blue-500 dark:text-blue-300'
-                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300',
+              form.priority === 'low'
+                ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:border-emerald-500 dark:text-emerald-300 ring-2 ring-emerald-500/20 shadow-xs'
+                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300',
             ]"
-            @click="form.priority = p"
+            @click="form.priority = 'low'"
           >
-            {{ t(p) }}
+            <span class="w-2 h-2 rounded-full bg-emerald-500" />
+            {{ t('low') }}
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-2 text-xs font-bold rounded-xl border transition-all text-center cursor-pointer flex items-center justify-center gap-1.5"
+            :class="[
+              form.priority === 'medium'
+                ? 'border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:border-amber-500 dark:text-amber-300 ring-2 ring-amber-500/20 shadow-xs'
+                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300',
+            ]"
+            @click="form.priority = 'medium'"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500" />
+            {{ t('medium') }}
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-2 text-xs font-bold rounded-xl border transition-all text-center cursor-pointer flex items-center justify-center gap-1.5"
+            :class="[
+              form.priority === 'high'
+                ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:border-rose-500 dark:text-rose-300 ring-2 ring-rose-500/20 shadow-xs'
+                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300',
+            ]"
+            @click="form.priority = 'high'"
+          >
+            <span class="w-2 h-2 rounded-full bg-rose-500" />
+            {{ t('high') }}
           </button>
         </div>
       </div>

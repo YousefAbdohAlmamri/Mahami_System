@@ -17,19 +17,19 @@ defineProps({
 
 const variantClasses = {
   primary:
-    'bg-blue-600 hover:bg-blue-700 text-white focus-visible:ring-blue-500 disabled:bg-blue-300',
+    'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xs shadow-blue-500/25 hover:shadow-md hover:shadow-blue-500/30 focus-visible:ring-blue-500 disabled:from-blue-400 disabled:to-indigo-400',
   secondary:
-    'bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 focus-visible:ring-slate-400',
+    'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/70 shadow-2xs hover:shadow-xs focus-visible:ring-slate-400',
   danger:
-    'bg-red-600 hover:bg-red-700 text-white focus-visible:ring-red-500 disabled:bg-red-300',
+    'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-xs shadow-red-500/25 hover:shadow-md hover:shadow-red-500/30 focus-visible:ring-red-500 disabled:from-red-400 disabled:to-rose-400',
   ghost:
-    'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 focus-visible:ring-slate-400',
+    'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 focus-visible:ring-slate-400',
 }
 
 const sizeClasses = {
-  sm: 'px-3 py-1.5 text-sm gap-1.5',
-  md: 'px-4 py-2 text-sm gap-2',
-  lg: 'px-5 py-2.5 text-base gap-2',
+  sm: 'px-3 py-1.5 text-xs font-semibold gap-1.5 rounded-lg',
+  md: 'px-4 py-2 text-sm font-medium gap-2 rounded-xl',
+  lg: 'px-5 py-2.5 text-base font-medium gap-2.5 rounded-xl',
 }
 </script>
 
@@ -38,9 +38,9 @@ const sizeClasses = {
     :type="type"
     :disabled="disabled || loading"
     :class="[
-      'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-150',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
-      'disabled:opacity-60 disabled:cursor-not-allowed',
+      'inline-flex items-center justify-center transition-all duration-150 active:scale-[0.98] select-none cursor-pointer',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900',
+      'disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100',
       variantClasses[variant],
       sizeClasses[size],
     ]"
