@@ -13,7 +13,18 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return (int) $user->id === (int) $task->list->board->user_id;
+        $board = $task->list?->board;
+        if (!$board) return false;
+
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id) {
+            return $board->getUserPermission($user) !== null;
+        }
+
+        return false;
     }
 
     /**
@@ -21,7 +32,19 @@ class TaskPolicy
      */
     public function create(User $user, BoardList $list): bool
     {
-        return (int) $user->id === (int) $list->board->user_id;
+        $board = $list->board;
+        if (!$board) return false;
+
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id) {
+            $perm = $board->getUserPermission($user);
+            return in_array($perm, ['editor', 'admin'], true);
+        }
+
+        return false;
     }
 
     /**
@@ -29,7 +52,19 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return (int) $user->id === (int) $task->list->board->user_id;
+        $board = $task->list?->board;
+        if (!$board) return false;
+
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id) {
+            $perm = $board->getUserPermission($user);
+            return in_array($perm, ['editor', 'admin'], true);
+        }
+
+        return false;
     }
 
     /**
@@ -37,7 +72,19 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return (int) $user->id === (int) $task->list->board->user_id;
+        $board = $task->list?->board;
+        if (!$board) return false;
+
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id) {
+            $perm = $board->getUserPermission($user);
+            return in_array($perm, ['editor', 'admin'], true);
+        }
+
+        return false;
     }
 
     /**
@@ -46,10 +93,15 @@ class TaskPolicy
      */
     public function move(User $user, Task $task, BoardList $targetList): bool
     {
-        $ownsSource = (int) $user->id === (int) $task->list->board->user_id;
+        $board = $task->list?->board;
+        if (!$board) return false;
+
+        $hasAccess = (int) $user->id === (int) $board->user_id ||
+            ($board->workspace_id && in_array($board->getUserPermission($user), ['editor', 'admin'], true));
+
         $sameBoard = (int) $task->list->board_id === (int) $targetList->board_id;
 
-        return $ownsSource && $sameBoard;
+        return $hasAccess && $sameBoard;
     }
 
     /**
@@ -57,7 +109,18 @@ class TaskPolicy
      */
     public function reorder(User $user, BoardList $list): bool
     {
-        return (int) $user->id === (int) $list->board->user_id;
+        $board = $list->board;
+        if (!$board) return false;
+
+        if ((int) $user->id === (int) $board->user_id) {
+            return true;
+        }
+
+        if ($board->workspace_id) {
+            $perm = $board->getUserPermission($user);
+            return in_array($perm, ['editor', 'admin'], true);
+        }
+
+        return false;
     }
 }
-

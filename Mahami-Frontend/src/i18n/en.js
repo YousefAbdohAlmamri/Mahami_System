@@ -144,6 +144,26 @@ export default {
   deleteTaskConfirm: 'Are you sure you want to delete this task?',
   taskDetails: 'Task Details',
 
+  // Task Advanced Features (Phase 3)
+  assignees: 'Assignees',
+  assignTo: 'Assign to',
+  noAssignees: 'Unassigned',
+  labels: 'Labels',
+  addLabel: 'Add Label',
+  createLabel: 'Create Label',
+  labelName: 'Label Name',
+  labelColor: 'Label Color',
+  checklists: 'Checklists',
+  addChecklist: 'Add Checklist',
+  checklistTitle: 'Checklist Title',
+  addItem: 'Add Item',
+  itemTitlePlaceholder: 'Add a subtask...',
+  attachments: 'Attachments',
+  uploadFile: 'Upload File',
+  overdue: 'Overdue',
+  dueToday: 'Due Today',
+  dueSoon: 'Due Soon',
+
   // Common Actions & UI
   save: 'Save',
   saving: 'Saving...',

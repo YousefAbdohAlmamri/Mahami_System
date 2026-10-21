@@ -144,6 +144,26 @@ export default {
   deleteTaskConfirm: 'هل أنت متأكد من حذف هذه المهمة نهائياً؟',
   taskDetails: 'تفاصيل المهمة',
 
+  // Task Advanced Features (Phase 3)
+  assignees: 'المسؤولون',
+  assignTo: 'تعيين لمسؤول',
+  noAssignees: 'غير مسندة لأحد',
+  labels: 'الوسوم',
+  addLabel: 'إضافة وسم',
+  createLabel: 'إنشاء وسم جديد',
+  labelName: 'اسم الوسم',
+  labelColor: 'لون الوسم',
+  checklists: 'قوائم المهام الفرعية',
+  addChecklist: 'إضافة قائمة مهام',
+  checklistTitle: 'عنوان القائمة',
+  addItem: 'إضافة عنصر',
+  itemTitlePlaceholder: 'أضف مهمة فرعية جديدة...',
+  attachments: 'المرفقات',
+  uploadFile: 'رفع ملف',
+  overdue: 'متأخرة',
+  dueToday: 'تستحق اليوم',
+  dueSoon: 'تستحق قريباً',
+
   // Common Actions & UI
   save: 'حفظ',
   saving: 'جاري الحفظ...',

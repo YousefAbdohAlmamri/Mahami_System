@@ -60,5 +60,41 @@ describe('Common Components', () => {
     await wrapper.trigger('click')
     expect(wrapper.emitted('click')[0]).toEqual([task])
   })
+
+  it('TaskCard displays Phase 3 labels, assignees, checklists and attachments', () => {
+    const task = {
+      id: 2,
+      title: 'Advanced Task Feature',
+      priority: 'medium',
+      due_date: '2026-11-20',
+      labels: [
+        { id: 10, name: 'BugFix', color: '#ef4444' },
+        { id: 11, name: 'UI', color: '#10b981' },
+      ],
+      assignees: [
+        { id: 1, name: 'Yousef' },
+        { id: 2, name: 'Ahmad' },
+      ],
+      checklist_summary: {
+        total: 4,
+        completed: 2,
+        percentage: 50,
+      },
+      attachments: [
+        { id: 1, file_name: 'document.pdf' },
+      ],
+    }
+    const wrapper = mount(TaskCard, {
+      props: { task },
+    })
+
+    expect(wrapper.text()).toContain('Advanced Task Feature')
+    expect(wrapper.text()).toContain('BugFix')
+    expect(wrapper.text()).toContain('UI')
+    expect(wrapper.text()).toContain('2/4')
+    expect(wrapper.text()).toContain('1') // Attachment badge count
+    expect(wrapper.text()).toContain('Y') // Assignee avatar initial
+    expect(wrapper.text()).toContain('A') // Assignee avatar initial
+  })
 })
 

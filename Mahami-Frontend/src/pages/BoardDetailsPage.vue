@@ -161,6 +161,19 @@ function openTaskDetails(task) {
   showTaskDetailsModal.value = true
 }
 
+function handleTaskUpdated(updatedTask) {
+  selectedTaskForDetails.value = updatedTask
+  if (boardStore.currentBoard?.lists) {
+    for (const list of boardStore.currentBoard.lists) {
+      const idx = list.tasks?.findIndex((t) => t.id === updatedTask.id) ?? -1
+      if (idx !== -1) {
+        list.tasks[idx] = { ...list.tasks[idx], ...updatedTask }
+        break
+      }
+    }
+  }
+}
+
 async function handleSaveTask(data) {
   isSubmittingTask.value = true
   try {
@@ -422,8 +435,10 @@ async function executeDelete() {
     <TaskDetailsModal
       v-if="showTaskDetailsModal && selectedTaskForDetails"
       :task="selectedTaskForDetails"
+      :board="boardStore.currentBoard"
       @edit="(t) => { showTaskDetailsModal = false; openEditTaskModal(t); }"
       @delete="(t) => { confirmDeleteTask(t); }"
+      @task-updated="handleTaskUpdated"
       @close="showTaskDetailsModal = false"
     />
 

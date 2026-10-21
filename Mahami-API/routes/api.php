@@ -4,7 +4,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BoardController;
 use App\Http\Controllers\Api\BoardListController;
 use App\Http\Controllers\Api\BoardTeamController;
+use App\Http\Controllers\Api\LabelController;
+use App\Http\Controllers\Api\TaskAssigneeController;
+use App\Http\Controllers\Api\TaskAttachmentController;
+use App\Http\Controllers\Api\TaskChecklistController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\TaskLabelController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\TeamMemberController;
 use App\Http\Controllers\Api\WorkspaceController;
@@ -96,4 +101,37 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
     Route::patch('/tasks/{task}/move', [TaskController::class, 'move']);
     Route::patch('/lists/{list}/tasks/reorder', [TaskController::class, 'reorder']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Phase 3: Labels, Assignees, Checklists & Attachments Routes
+    |--------------------------------------------------------------------------
+    */
+    // Board Labels
+    Route::get('/boards/{board}/labels', [LabelController::class, 'index']);
+    Route::post('/boards/{board}/labels', [LabelController::class, 'store']);
+    Route::put('/boards/{board}/labels/{label}', [LabelController::class, 'update']);
+    Route::delete('/boards/{board}/labels/{label}', [LabelController::class, 'destroy']);
+
+    // Task Assignees
+    Route::post('/tasks/{task}/assignees', [TaskAssigneeController::class, 'sync']);
+    Route::post('/tasks/{task}/assignees/add', [TaskAssigneeController::class, 'store']);
+    Route::delete('/tasks/{task}/assignees/{user}', [TaskAssigneeController::class, 'destroy']);
+
+    // Task Labels
+    Route::post('/tasks/{task}/labels', [TaskLabelController::class, 'sync']);
+    Route::post('/tasks/{task}/labels/{label}', [TaskLabelController::class, 'attach']);
+    Route::delete('/tasks/{task}/labels/{label}', [TaskLabelController::class, 'detach']);
+
+    // Checklists & Items
+    Route::post('/tasks/{task}/checklists', [TaskChecklistController::class, 'store']);
+    Route::put('/checklists/{checklist}', [TaskChecklistController::class, 'update']);
+    Route::delete('/checklists/{checklist}', [TaskChecklistController::class, 'destroy']);
+    Route::post('/checklists/{checklist}/items', [TaskChecklistController::class, 'addItem']);
+    Route::put('/checklist-items/{item}', [TaskChecklistController::class, 'updateItem']);
+    Route::delete('/checklist-items/{item}', [TaskChecklistController::class, 'destroyItem']);
+
+    // Attachments
+    Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store']);
+    Route::delete('/attachments/{attachment}', [TaskAttachmentController::class, 'destroy']);
 });

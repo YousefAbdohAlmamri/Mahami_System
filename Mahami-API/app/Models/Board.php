@@ -50,6 +50,14 @@ class Board extends Model
     }
 
     /**
+     * Labels defined on this board.
+     */
+    public function labels(): HasMany
+    {
+        return $this->hasMany(Label::class);
+    }
+
+    /**
      * Teams assigned to this board.
      */
     public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

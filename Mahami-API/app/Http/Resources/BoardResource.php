@@ -26,6 +26,7 @@ class BoardResource extends JsonResource
             'lists_count' => $this->lists_count !== null
                 ? (int) $this->lists_count
                 : ($this->relationLoaded('lists') ? $this->lists->count() : 0),
+            'labels' => LabelResource::collection($this->whenLoaded('labels')),
             'lists' => BoardListResource::collection($this->whenLoaded('lists')),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
