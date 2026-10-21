@@ -83,4 +83,20 @@ class User extends Authenticatable
             ->withPivot('role')
             ->withTimestamps();
     }
+
+    /**
+     * Task comments written by the user.
+     */
+    public function taskComments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TaskComment::class);
+    }
+
+    /**
+     * Activities logged by the user.
+     */
+    public function activityLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }

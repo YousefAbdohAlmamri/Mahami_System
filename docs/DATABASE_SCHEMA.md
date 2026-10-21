@@ -179,13 +179,31 @@
 | `mime_type` | VARCHAR(128) | NOT NULL | MIME content type |
 | `created_at` / `updated_at` | TIMESTAMP | NULLABLE | Timestamps |
 
+### 1.18 `task_comments` (Phase 4)
+| Column | Type | Attributes | Description |
+|---|---|---|---|
+| `id` | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | Comment ID |
+| `task_id` | BIGINT UNSIGNED | NOT NULL, FK -> `tasks(id)` ON DELETE CASCADE | Parent Task |
+| `user_id` | BIGINT UNSIGNED | NOT NULL, FK -> `users(id)` ON DELETE CASCADE | Author reference |
+| `content` | TEXT | NOT NULL | Comment text / Markdown |
+| `created_at` / `updated_at` | TIMESTAMP | NULLABLE | Timestamps |
+
+### 1.19 `activity_logs` (Phase 4)
+| Column | Type | Attributes | Description |
+|---|---|---|---|
+| `id` | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | Log ID |
+| `workspace_id` | BIGINT UNSIGNED | NULLABLE, FK -> `workspaces(id)` ON DELETE CASCADE | Workspace reference |
+| `board_id` | BIGINT UNSIGNED | NOT NULL, FK -> `boards(id)` ON DELETE CASCADE | Board reference |
+| `task_id` | BIGINT UNSIGNED | NULLABLE, FK -> `tasks(id)` ON DELETE CASCADE | Task reference |
+| `user_id` | BIGINT UNSIGNED | NOT NULL, FK -> `users(id)` ON DELETE CASCADE | Actor reference |
+| `action` | VARCHAR(50) | NOT NULL, INDEX | Action key ('commented', 'created', etc.) |
+| `description` | VARCHAR(255) | NOT NULL | Human-readable audit description |
+| `properties` | JSON | NULLABLE | Additional parameters / diffs |
+| `created_at` | TIMESTAMP | NULLABLE, INDEX | Action timestamp |
+
 ---
 
-## 2. Planned Schema Extensions (Upcoming Phases 4 - 6)
-
-### Phase 4 — Collaboration & Activity
-- `task_comments`: `id`, `task_id` (FK), `user_id` (FK), `parent_id` (FK nullable), `content`, `created_at`, `updated_at`
-- `activity_logs`: `id`, `workspace_id` (FK), `board_id` (FK), `task_id` (FK nullable), `user_id` (FK), `action`, `details` (JSON), `created_at`
+## 2. Planned Schema Extensions (Upcoming Phases 5 - 6)
 
 ### Phase 5 — Real-Time Notifications
 - `notifications`: standard Laravel notification table (`id` UUID, `type`, `notifiable_type`, `notifiable_id`, `data` JSON, `read_at`, `created_at`)

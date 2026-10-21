@@ -164,6 +164,18 @@ export default {
   dueToday: 'تستحق اليوم',
   dueSoon: 'تستحق قريباً',
 
+  // Collaboration (Phase 4)
+  comments: 'التعليقات',
+  addComment: 'إضافة تعليق',
+  commentPlaceholder: 'اكتب تعليقاً... (يمكنك استخدام @ للإشارة لعضو)',
+  noComments: 'لا توجد تعليقات حتى الآن. كن أول من يشارك!',
+  activityLog: 'سجل النشاط',
+  noActivities: 'لا يوجد نشاط مسجل بعد.',
+  boardActivities: 'سجل نشاط اللوحة',
+  tabDetails: 'التفاصيل',
+  tabComments: 'التعليقات',
+  tabActivity: 'سجل النشاط',
+
   // Common Actions & UI
   save: 'حفظ',
   saving: 'جاري الحفظ...',

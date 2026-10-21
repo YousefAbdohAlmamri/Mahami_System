@@ -5,6 +5,7 @@ import { useToast } from '@/composables/useToast'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { useBoardStore } from '@/stores/boardStore'
 import taskService from '@/services/taskService'
+import commentService from '@/services/commentService'
 import AppModal from '@/components/common/AppModal.vue'
 import AppButton from '@/components/common/AppButton.vue'
 
@@ -25,6 +26,9 @@ const toast = useToast()
 const workspaceStore = useWorkspaceStore()
 const boardStore = useBoardStore()
 
+// Navigation Tabs
+const activeTab = ref('details') // 'details' | 'comments' | 'activities'
+
 // Local copy of task to reflect immediate edits
 const currentTask = ref({ ...props.task })
 const isLoadingDetails = ref(false)
@@ -42,6 +46,18 @@ const fileInputRef = ref(null)
 const newLabelName = ref('')
 const newLabelColor = ref('#3b82f6')
 const isCreatingLabel = ref(false)
+
+// Phase 4 Collaboration states
+const comments = ref([])
+const isLoadingComments = ref(false)
+const newCommentContent = ref('')
+const isPostingComment = ref(false)
+const editingCommentId = ref(null)
+const editingCommentContent = ref('')
+const showMentionDropdown = ref(false)
+
+const activities = ref([])
+const isLoadingActivities = ref(false)
 
 const PRESET_COLORS = [
   '#ef4444', // Red
@@ -81,7 +97,6 @@ const availableAssignees = computed(() => {
       email: m.email,
     }))
   }
-  // Fallback if no workspace members loaded
   if (currentTask.value.assignees && currentTask.value.assignees.length > 0) {
     return currentTask.value.assignees
   }
@@ -115,6 +130,31 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
+function formatTimestamp(isoString) {
+  if (!isoString) return ''
+  try {
+    const date = new Date(isoString)
+    return date.toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return isoString
+  }
+}
+
+// ── Tab Switching ─────────────────────────────────────────────
+async function switchTab(tab) {
+  activeTab.value = tab
+  if (tab === 'comments' && comments.value.length === 0) {
+    await fetchComments()
+  } else if (tab === 'activities' && activities.value.length === 0) {
+    await fetchActivities()
+  }
+}
+
 // ── Initial Fetch ─────────────────────────────────────────────
 onMounted(async () => {
   try {
@@ -124,13 +164,12 @@ onMounted(async () => {
       currentTask.value = response.data
       emit('task-updated', currentTask.value)
     }
-  } catch (err) {
-    // Graceful fallback to initial task prop
+  } catch {
+    // Fallback
   } finally {
     isLoadingDetails.value = false
   }
 
-  // Load workspace members if available and empty
   if (activeBoard.value?.workspace_id && workspaceStore.members.length === 0) {
     try {
       await workspaceStore.fetchMembers(activeBoard.value.workspace_id)
@@ -139,7 +178,6 @@ onMounted(async () => {
     }
   }
 
-  // Load board labels if board labels empty
   if (activeBoard.value?.id && (!activeBoard.value.labels || activeBoard.value.labels.length === 0)) {
     try {
       const res = await taskService.getBoardLabels(activeBoard.value.id)
@@ -208,7 +246,6 @@ async function handleCreateLabel() {
       if (!activeBoard.value.labels) activeBoard.value.labels = []
       activeBoard.value.labels.push(createdLabel)
     }
-    // Automatically attach new label to task
     await toggleLabel(createdLabel)
     newLabelName.value = ''
     newLabelColor.value = '#3b82f6'
@@ -275,9 +312,9 @@ async function handleToggleItem(checklist, item) {
   try {
     await taskService.updateChecklistItem(item.id, { is_completed: item.is_completed })
     emit('task-updated', currentTask.value)
-  } catch (err) {
+  } catch {
     item.is_completed = prevVal
-    toast.error(err.response?.data?.message || t('genericError'))
+    toast.error(t('genericError'))
   }
 }
 
@@ -327,13 +364,99 @@ async function handleDeleteAttachment(attachmentId) {
     toast.error(err.response?.data?.message || t('genericError'))
   }
 }
+
+// ── Phase 4 Collaboration Handlers (Comments & Activities) ────
+async function fetchComments() {
+  isLoadingComments.value = true
+  try {
+    const res = await commentService.getTaskComments(currentTask.value.id)
+    comments.value = res.data || []
+  } catch (err) {
+    toast.error(err.response?.data?.message || t('genericError'))
+  } finally {
+    isLoadingComments.value = false
+  }
+}
+
+async function fetchActivities() {
+  isLoadingActivities.value = true
+  try {
+    const res = await commentService.getTaskActivities(currentTask.value.id)
+    activities.value = res.data || []
+  } catch (err) {
+    toast.error(err.response?.data?.message || t('genericError'))
+  } finally {
+    isLoadingActivities.value = false
+  }
+}
+
+function insertMention(memberName) {
+  newCommentContent.value += ` @${memberName} `
+  showMentionDropdown.value = false
+}
+
+async function handlePostComment() {
+  if (!newCommentContent.value.trim()) return
+  isPostingComment.value = true
+  try {
+    const res = await commentService.createTaskComment(currentTask.value.id, {
+      content: newCommentContent.value.trim(),
+    })
+    comments.value.push(res.data)
+    newCommentContent.value = ''
+    currentTask.value.comments_count = (currentTask.value.comments_count || 0) + 1
+    emit('task-updated', currentTask.value)
+    toast.success(t('createdSuccessfully'))
+  } catch (err) {
+    toast.error(err.response?.data?.message || t('genericError'))
+  } finally {
+    isPostingComment.value = false
+  }
+}
+
+function startEditComment(comment) {
+  editingCommentId.value = comment.id
+  editingCommentContent.value = comment.content
+}
+
+async function handleSaveEditComment(commentId) {
+  if (!editingCommentContent.value.trim()) return
+  try {
+    const res = await commentService.updateTaskComment(commentId, {
+      content: editingCommentContent.value.trim(),
+    })
+    const idx = comments.value.findIndex((c) => c.id === commentId)
+    if (idx !== -1) {
+      comments.value[idx] = res.data
+    }
+    editingCommentId.value = null
+    editingCommentContent.value = ''
+    toast.success(t('savedSuccessfully'))
+  } catch (err) {
+    toast.error(err.response?.data?.message || t('genericError'))
+  }
+}
+
+async function handleDeleteComment(commentId) {
+  try {
+    await commentService.deleteTaskComment(commentId)
+    comments.value = comments.value.filter((c) => c.id !== commentId)
+    if (currentTask.value.comments_count > 0) {
+      currentTask.value.comments_count--
+    }
+    emit('task-updated', currentTask.value)
+    toast.success(t('deletedSuccessfully'))
+  } catch (err) {
+    toast.error(err.response?.data?.message || t('genericError'))
+  }
+}
 </script>
 
 <template>
   <AppModal size="xl" :title="t('taskDetails')" @close="emit('close')">
-    <div class="space-y-6">
+    <div class="space-y-5">
       <!-- Title & Badges Bar -->
-      <div class="space-y-2.5 pb-4 border-b border-slate-200/80 dark:border-slate-800">
+      <div class="space-y-2.5 pb-2 border-b border-slate-200/80 dark:border-slate-800">
         <h3 class="text-xl font-bold text-slate-900 dark:text-white leading-relaxed">
           {{ currentTask.title }}
         </h3>
@@ -373,8 +496,67 @@ async function handleDeleteAttachment(attachmentId) {
         </div>
       </div>
 
-      <!-- Main Layout: 2 Columns on desktop -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Navigation Tabs -->
+      <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+        <button
+          type="button"
+          class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+          :class="
+            activeTab === 'details'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          "
+          @click="switchTab('details')"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
+          {{ t('tabDetails') }}
+        </button>
+
+        <button
+          type="button"
+          class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+          :class="
+            activeTab === 'comments'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          "
+          @click="switchTab('comments')"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          {{ t('tabComments') }}
+          <span
+            v-if="comments.length > 0 || currentTask.comments_count > 0"
+            class="px-1.5 py-0.2 rounded-full text-3xs font-bold"
+            :class="activeTab === 'comments' ? 'bg-white/25 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'"
+          >
+            {{ comments.length || currentTask.comments_count || 0 }}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+          :class="
+            activeTab === 'activities'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          "
+          @click="switchTab('activities')"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          {{ t('tabActivity') }}
+        </button>
+      </div>
+
+      <!-- TAB 1: DETAILS (2 Columns on desktop) -->
+      <div v-if="activeTab === 'details'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left / Main Column (2 cols) -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Description -->
@@ -783,6 +965,169 @@ async function handleDeleteAttachment(attachmentId) {
             </div>
             <div v-else class="text-xs text-slate-400">
               {{ t('labels') }} —
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: COMMENTS (Phase 4 Collaboration) -->
+      <div v-else-if="activeTab === 'comments'" class="space-y-5">
+        <!-- New Comment Box -->
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="relative">
+            <textarea
+              v-model="newCommentContent"
+              rows="3"
+              :placeholder="t('commentPlaceholder')"
+              class="w-full p-3 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+            />
+
+            <!-- Mention Autocomplete Helper Button / Dropdown -->
+            <div class="flex items-center justify-between pt-1">
+              <div class="relative">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  @click="showMentionDropdown = !showMentionDropdown"
+                >
+                  <span>@</span>
+                  <span>{{ t('assignTo') }}</span>
+                </button>
+
+                <div
+                  v-if="showMentionDropdown"
+                  class="absolute start-0 mt-1 w-48 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-20 space-y-1 max-h-40 overflow-y-auto"
+                >
+                  <div
+                    v-for="u in availableAssignees"
+                    :key="u.id"
+                    class="px-2.5 py-1 text-xs font-medium rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer truncate"
+                    @click="insertMention(u.name)"
+                  >
+                    @{{ u.name }}
+                  </div>
+                </div>
+              </div>
+
+              <AppButton
+                variant="primary"
+                size="sm"
+                :loading="isPostingComment"
+                :disabled="!newCommentContent.trim()"
+                @click="handlePostComment"
+              >
+                {{ t('addComment') }}
+              </AppButton>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments Feed -->
+        <div v-if="isLoadingComments" class="py-8 text-center text-xs text-slate-400">
+          {{ t('loading') }}
+        </div>
+        <div v-else-if="comments.length === 0" class="py-8 text-center text-xs text-slate-400">
+          {{ t('noComments') }}
+        </div>
+        <div v-else class="space-y-3 max-h-96 overflow-y-auto pe-1">
+          <div
+            v-for="comment in comments"
+            :key="comment.id"
+            class="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          >
+            <!-- Comment Header: Avatar, Name, Time, Actions -->
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-3xs uppercase shadow-2xs">
+                  {{ (comment.user?.name || 'U').charAt(0) }}
+                </div>
+                <div>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {{ comment.user?.name }}
+                  </span>
+                  <span class="text-3xs text-slate-400 ms-2">
+                    {{ formatTimestamp(comment.created_at) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Edit / Delete actions -->
+              <div v-if="comment.can_edit || comment.can_delete" class="flex items-center gap-1">
+                <button
+                  v-if="comment.can_edit && editingCommentId !== comment.id"
+                  class="p-1 text-slate-400 hover:text-blue-500 rounded transition-colors"
+                  :title="t('editTask')"
+                  @click="startEditComment(comment)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                  </svg>
+                </button>
+                <button
+                  v-if="comment.can_delete"
+                  class="p-1 text-slate-400 hover:text-red-500 rounded transition-colors"
+                  :title="t('delete')"
+                  @click="handleDeleteComment(comment.id)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Comment Content / Edit Form -->
+            <div v-if="editingCommentId === comment.id" class="space-y-2 pt-1">
+              <textarea
+                v-model="editingCommentContent"
+                rows="2"
+                class="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white resize-none focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+              />
+              <div class="flex items-center justify-end gap-2">
+                <AppButton variant="ghost" size="xs" @click="editingCommentId = null">
+                  {{ t('cancel') }}
+                </AppButton>
+                <AppButton variant="primary" size="xs" :disabled="!editingCommentContent.trim()" @click="handleSaveEditComment(comment.id)">
+                  {{ t('save') }}
+                </AppButton>
+              </div>
+            </div>
+            <div v-else class="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+              {{ comment.content }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ACTIVITIES (Phase 4 Audit Trail) -->
+      <div v-else-if="activeTab === 'activities'" class="space-y-4">
+        <div v-if="isLoadingActivities" class="py-8 text-center text-xs text-slate-400">
+          {{ t('loading') }}
+        </div>
+        <div v-else-if="activities.length === 0" class="py-8 text-center text-xs text-slate-400">
+          {{ t('noActivities') }}
+        </div>
+        <div v-else class="relative border-s-2 border-slate-200 dark:border-slate-800 ms-3 space-y-4 max-h-96 overflow-y-auto pe-1">
+          <div
+            v-for="act in activities"
+            :key="act.id"
+            class="relative ps-5"
+          >
+            <!-- Timeline dot -->
+            <div class="absolute -start-[5px] top-1.5 w-2 h-2 rounded-full bg-blue-500 ring-4 ring-white dark:ring-slate-900" />
+
+            <div class="p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  {{ act.user?.name || 'System' }}
+                </span>
+                <span class="text-3xs text-slate-400">
+                  {{ formatTimestamp(act.created_at) }}
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">
+                {{ act.description }}
+              </p>
             </div>
           </div>
         </div>

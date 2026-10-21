@@ -96,5 +96,20 @@ describe('Common Components', () => {
     expect(wrapper.text()).toContain('Y') // Assignee avatar initial
     expect(wrapper.text()).toContain('A') // Assignee avatar initial
   })
+
+  it('TaskCard displays Phase 4 comments count badge', () => {
+    const task = {
+      id: 3,
+      title: 'Task with comments',
+      priority: 'low',
+      comments_count: 5,
+    }
+    const wrapper = mount(TaskCard, {
+      props: { task },
+    })
+
+    expect(wrapper.text()).toContain('Task with comments')
+    expect(wrapper.text()).toContain('5') // Comments count badge
+  })
 })
 

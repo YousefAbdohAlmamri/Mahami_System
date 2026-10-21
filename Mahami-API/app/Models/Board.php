@@ -58,6 +58,14 @@ class Board extends Model
     }
 
     /**
+     * Activity logs recorded on this board.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class)->latest();
+    }
+
+    /**
      * Teams assigned to this board.
      */
     public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

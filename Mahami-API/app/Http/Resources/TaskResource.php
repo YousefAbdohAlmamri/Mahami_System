@@ -46,6 +46,7 @@ class TaskResource extends JsonResource
                 'percentage' => $progressPct,
             ],
             'attachments' => TaskAttachmentResource::collection($this->relationLoaded('attachments') ? $this->attachments : $this->attachments()->with('uploader')->get()),
+            'comments_count' => $this->relationLoaded('comments') ? $this->comments->count() : $this->comments()->count(),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

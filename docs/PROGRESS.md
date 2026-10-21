@@ -2,10 +2,10 @@
 
 ## Global Status Overview
 - **System Name:** Mahami (مهامي) — Full Team & Project Management Platform
-- **Current Phase:** Phase 3 — Advanced Projects and Tasks (Completed)
-- **Next Phase:** Phase 4 — Collaboration (Comments, Mentions, Activity Logs) (Awaiting Approval)
+- **Current Phase:** Phase 4 — Collaboration (Comments, Mentions, Activity Logs) (Completed)
+- **Next Phase:** Phase 5 — Real-Time Notifications, Queues, and Reminders (Awaiting Approval)
 - **Last Updated:** 2026-10-22
-- **Overall Quality:** 106/106 Tests Passing (79 Backend Tests [322 assertions] + 27 Frontend Tests), 0 Compilation Errors, Clean Vite Production Build.
+- **Overall Quality:** 111/111 Tests Passing (83 Backend Tests [345 assertions] + 28 Frontend Tests), 0 Compilation Errors, Clean Vite Production Build.
 
 ---
 
@@ -101,14 +101,47 @@
 ---
 
 ### Phase 4 — Collaboration (Comments, Mentions, Activity Logs)
+- **Status:** `Completed`
+- **Scope & Completed Actions:**
+  1. **Database Schema & Migrations:**
+     - `2026_10_21_222200_create_task_comments_table.php` (`task_id`, `user_id`, `content`, `timestamps`).
+     - `2026_10_21_222349_create_activity_logs_table.php` (`workspace_id`, `board_id`, `task_id`, `user_id`, `action`, `description`, `properties`, `created_at`).
+     - Total migrations in MariaDB: 21 tracked and executed.
+  2. **Backend Domain, Resources & Authorization:**
+     - Created `TaskComment` and `ActivityLog` models with relations to `Task`, `Board`, `User`, and `Workspace`.
+     - Built `ActivityLogger` service for automatic audit trail logging on task collaboration events.
+     - Built `TaskCommentPolicy` (`viewAny`, `create`, `update`, `delete`) and authorized access.
+     - Created `TaskCommentResource` (with extracted `@mentions`, `can_edit`, `can_delete`) and `ActivityLogResource`.
+     - Updated `TaskResource` with `comments_count`.
+     - Updated `EloquentBoardRepository` eager-loading to include comments with zero N+1 queries.
+  3. **Backend Controllers & Routes:**
+     - `TaskCommentController`: List, create, update, and delete comments with automatic activity logging.
+     - `ActivityLogController`: Task-specific activities and board-wide audit trail.
+     - Registered routes in `Mahami-API/routes/api.php`.
+     - Authored `TaskCollaborationTest.php` with 4 feature tests (23 assertions).
+  4. **Frontend Integration:**
+     - Created `commentService.js` for comments and activity feeds.
+     - Updated `TaskCard.vue` with comments count badge.
+     - Re-architected `TaskDetailsModal.vue` with a 3-tab layout:
+       - **Details Tab:** Description, interactive checklists, attachments, assignees, and labels.
+       - **Comments Tab:** Feed of comments with author avatars, formatted timestamps, edit/delete actions for author, and `@mentions` autocomplete helper.
+       - **Activity Log Tab:** Vertical timeline audit trail showing actor, action, and timestamp.
+     - Updated `i18n/ar.js` and `i18n/en.js` with Phase 4 translation keys.
+     - Added test case in `components.spec.js` for comments count badge.
+  5. **Verification & Test Status:**
+     - Backend: 83/83 tests passed (345 assertions) in 4.41s.
+     - Frontend: 28/28 tests passed across all 7 test suites in 10.66s.
+     - Production Build: Vite production build succeeded in 1.50s with zero errors.
+- **Blockers / Open Issues:** None. Ready to proceed to Phase 5 upon user approval.
+
+---
+
+### Phase 5 — Real-Time Notifications, Queues, and Reminders
 - **Status:** `Awaiting Approval`
 - **Scope:**
-  - Task comments with markdown and time stamps.
-  - User @mentions in task comments.
-  - Audit trail / activity log for boards and tasks.
-
-### Phase 5 — Real-Time Notifications
-- **Status:** `Not Started`
+  - Database notifications (`notifications` table).
+  - Pusher / Laravel Echo real-time broadcast events (task updated, comment added, member assigned).
+  - Email / queue notifications for mentions and due date reminders.
 
 ### Phase 6 — Dashboard and Reports
 - **Status:** `Not Started`

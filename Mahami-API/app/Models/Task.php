@@ -82,4 +82,20 @@ class Task extends Model
     {
         return $this->hasMany(TaskAttachment::class)->latest();
     }
+
+    /**
+     * Comments on this task.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class)->oldest();
+    }
+
+    /**
+     * Activity logs for this task.
+     */
+    public function activities(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class)->latest();
+    }
 }

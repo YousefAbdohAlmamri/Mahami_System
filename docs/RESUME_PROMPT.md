@@ -7,21 +7,22 @@ Continue executing the Mahami Full Team & Project Management Platform implementa
 - Phase 0 (Audit and Baseline) is completed and verified.
 - Phase 1 (Workspaces and Memberships) is completed and verified.
 - Phase 2 (Teams and Permissions) is completed and verified.
-- Phase 3 (Advanced Projects and Tasks) is completed and verified:
-  - Database: 19 migrations executed cleanly in MariaDB.
-  - Backend: 79/79 Laravel PHPUnit tests passing (322 assertions) in 3.54s.
-  - Frontend: 27/27 Vitest unit & component tests passing across 7 suites.
-  - Production Build: Vite production build compiles in 2.23s with 0 errors.
-  - Features: Multiple task assignees, customizable board labels with color palette, interactive checklists with item toggles and progress bars, secure task attachments (upload, download, delete), and enhanced TaskCard + TaskDetailsModal with instant reactive updates.
+- Phase 3 (Advanced Projects and Tasks) is completed and verified.
+- Phase 4 (Collaboration: Comments, Mentions, Activity Logs) is completed and verified:
+  - Database: 21 migrations executed cleanly in MariaDB (`task_comments`, `activity_logs`).
+  - Backend: 83/83 Laravel PHPUnit tests passing (345 assertions) in 4.41s.
+  - Frontend: 28/28 Vitest unit & component tests passing across all 7 suites.
+  - Production Build: Vite production build compiles cleanly in 1.50s with 0 errors.
+  - Features: Task comments with edit/delete author permissions, @mentions detection and autocomplete helper, automatic audit trail logging via ActivityLogger, task and board activity feeds, TaskCard comments count badge, and a responsive 3-tab TaskDetailsModal (Details, Comments, Activity Log).
 - Project documentation is up-to-date in docs/ directory.
 
 ## Next Action:
-- Awaiting user approval to proceed with Phase 4 — Collaboration (Comments, Mentions, Activity Logs).
-- When approved, implement Phase 4:
-  1. Task comments migration (`task_comments` table with markdown body and user relations).
-  2. Mentions parsing and notifications linkage.
-  3. Activity logs migration (`activity_logs` or `board_activities` table) tracking task/board modifications.
-  4. Backend models, repositories, resources, policies, and API controllers for comments and activity feed.
-  5. Frontend Comments & Activity Log tab/section inside `TaskDetailsModal.vue`.
-  6. Backend and frontend tests for comments and audit logs.
+- Awaiting user approval to proceed with Phase 5 — Real-Time Notifications, Queues, and Reminders.
+- When approved, implement Phase 5:
+  1. Laravel Notifications table migration (`php artisan notifications:table`).
+  2. In-app notifications API (`/api/notifications`, mark as read, unread count).
+  3. Real-time broadcasting event setup (Laravel Echo / Pusher / Reverb drivers) for instant task updates, new comments, and assignment alerts.
+  4. Scheduled artisan command for due date reminder notifications.
+  5. Frontend Notifications dropdown menu in MainLayout with unread badge counter.
+  6. Backend and frontend tests for notifications and broadcast events.
 ```

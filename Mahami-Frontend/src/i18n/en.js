@@ -164,6 +164,18 @@ export default {
   dueToday: 'Due Today',
   dueSoon: 'Due Soon',
 
+  // Collaboration (Phase 4)
+  comments: 'Comments',
+  addComment: 'Add Comment',
+  commentPlaceholder: 'Write a comment... (use @ to mention a member)',
+  noComments: 'No comments yet. Be the first to share thoughts!',
+  activityLog: 'Activity Log',
+  noActivities: 'No activity recorded yet.',
+  boardActivities: 'Board Activity Log',
+  tabDetails: 'Details',
+  tabComments: 'Comments',
+  tabActivity: 'Activity',
+
   // Common Actions & UI
   save: 'Save',
   saving: 'Saving...',

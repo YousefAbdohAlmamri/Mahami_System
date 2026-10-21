@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BoardController;
 use App\Http\Controllers\Api\BoardListController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Api\LabelController;
 use App\Http\Controllers\Api\TaskAssigneeController;
 use App\Http\Controllers\Api\TaskAttachmentController;
 use App\Http\Controllers\Api\TaskChecklistController;
+use App\Http\Controllers\Api\TaskCommentController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskLabelController;
 use App\Http\Controllers\Api\TeamController;
@@ -134,4 +136,19 @@ Route::middleware('auth:sanctum')->group(function () {
     // Attachments
     Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store']);
     Route::delete('/attachments/{attachment}', [TaskAttachmentController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Phase 4: Collaboration (Comments, Mentions, Activity Logs) Routes
+    |--------------------------------------------------------------------------
+    */
+    // Task Comments
+    Route::get('/tasks/{task}/comments', [TaskCommentController::class, 'index']);
+    Route::post('/tasks/{task}/comments', [TaskCommentController::class, 'store']);
+    Route::put('/comments/{comment}', [TaskCommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [TaskCommentController::class, 'destroy']);
+
+    // Activity Logs
+    Route::get('/tasks/{task}/activities', [ActivityLogController::class, 'taskActivities']);
+    Route::get('/boards/{board}/activities', [ActivityLogController::class, 'boardActivities']);
 });

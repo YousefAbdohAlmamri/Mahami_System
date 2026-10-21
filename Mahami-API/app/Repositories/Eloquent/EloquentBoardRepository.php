@@ -63,7 +63,7 @@ class EloquentBoardRepository implements BoardRepositoryInterface
                     $query->orderBy('position')->with([
                         'tasks' => function ($taskQuery) {
                             $taskQuery->orderBy('position')
-                                ->with(['assignees', 'labels', 'checklists.items', 'attachments']);
+                                ->with(['assignees', 'labels', 'checklists.items', 'attachments', 'comments']);
                         }
                     ]);
                 }

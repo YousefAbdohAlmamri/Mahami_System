@@ -188,6 +188,17 @@ const labels = computed(() => {
           </svg>
           <span>{{ attachmentsCount }}</span>
         </div>
+
+        <!-- Comments count badge -->
+        <div
+          v-if="task.comments_count > 0"
+          class="flex items-center gap-1 font-medium text-slate-500 dark:text-slate-400"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>{{ task.comments_count }}</span>
+        </div>
       </div>
 
       <!-- Assignees Avatars -->
