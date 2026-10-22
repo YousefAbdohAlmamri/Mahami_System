@@ -209,3 +209,4 @@ sudo ln -s /etc/nginx/sites-available/mahami-frontend /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/mahami-api /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
+

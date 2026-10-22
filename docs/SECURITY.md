@@ -89,3 +89,4 @@ graph TD
 ## 5. Security Incident Response & Audit Trail
 
 - All critical actions (creation, movement, assignment, comments, uploads) are immutably logged into `activity_logs` with actor ID, timestamp, and metadata for forensics and compliance.
+

@@ -173,3 +173,4 @@ class SecurityAndPerformanceTest extends TestCase
         $this->assertLessThanOrEqual(12, $queryCount);
     }
 }
+
