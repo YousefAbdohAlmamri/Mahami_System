@@ -42,3 +42,4 @@ class WorkspaceInvitationResponseNotification extends Notification
         ];
     }
 }
+

@@ -42,6 +42,12 @@ async function handleNotificationClick(item) {
   if (item.type === 'workspace_invitation' && item.token) {
     closeDropdown()
     router.push({ name: 'accept-invitation', params: { token: item.token } })
+    return
+  }
+
+  if (item.board_id) {
+    closeDropdown()
+    router.push({ name: 'board-details', params: { id: item.board_id } })
   }
 }
 
@@ -90,18 +96,28 @@ function formatTime(isoString) {
   }
 }
 
+function handleWindowFocus() {
+  if (document.visibilityState === 'visible') {
+    notificationStore.fetchNotifications()
+  }
+}
+
 onMounted(() => {
   notificationStore.fetchNotifications()
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('focus', handleWindowFocus)
+  document.addEventListener('visibilitychange', handleWindowFocus)
 
-  // Soft real-time polling every 30s
+  // Real-time polling every 5s for fast collaborative updates
   pollingTimer = setInterval(() => {
     notificationStore.fetchNotifications()
-  }, 30000)
+  }, 5000)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('focus', handleWindowFocus)
+  document.removeEventListener('visibilitychange', handleWindowFocus)
   if (pollingTimer) clearInterval(pollingTimer)
 })
 </script>
@@ -209,6 +225,11 @@ onBeforeUnmount(() => {
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </g>
+            </svg>
+            <!-- Task Assigned icon -->
+            <svg v-else-if="item.type === 'task_assigned'" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
             <!-- Mention icon -->
             <svg v-else-if="item.type === 'mention'" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

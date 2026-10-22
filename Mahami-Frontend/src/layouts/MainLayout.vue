@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useI18n } from '@/composables/useI18n'
 import { useToast } from '@/composables/useToast'
@@ -15,6 +16,7 @@ import NotificationDropdown from '@/components/common/NotificationDropdown.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const workspaceStore = useWorkspaceStore()
+const notificationStore = useNotificationStore()
 const prefs = usePreferencesStore()
 const { t } = useI18n()
 const toast = useToast()
@@ -109,6 +111,7 @@ async function handleDeleteWorkspace() {
 async function handleLogout() {
   userMenuOpen.value = false
   workspaceStore.reset()
+  notificationStore.reset()
   await authStore.logout()
   toast.success(t('loggedOut'))
   router.push({ name: 'login' })

@@ -22,15 +22,17 @@ class TaskAssigneeController extends Controller
             'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
-        $previousIds = $task->assignees()->pluck('users.id')->all();
-        $task->assignees()->sync($validated['user_ids']);
-        $newIds = array_diff($validated['user_ids'], $previousIds);
-        $currentUser = $request->user();
+        $previousIds = $task->assignees()->pluck('users.id')->map(fn($id) => (int) $id)->all();
+        $requestedIds = array_map('intval', $validated['user_ids']);
+
+        $task->assignees()->sync($requestedIds);
+        $newIds = array_diff($requestedIds, $previousIds);
+        $currentUserId = (int) $request->user()->id;
 
         foreach ($newIds as $newId) {
-            if ($newId !== $currentUser->id) {
+            if ((int) $newId !== $currentUserId) {
                 $userToNotify = User::find($newId);
-                $userToNotify?->notify(new TaskAssignedNotification($task, $currentUser));
+                $userToNotify?->notify(new TaskAssignedNotification($task, $request->user()));
             }
         }
 
@@ -48,10 +50,11 @@ class TaskAssigneeController extends Controller
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
-        $task->assignees()->syncWithoutDetaching([$validated['user_id']]);
+        $assigneeId = (int) $validated['user_id'];
+        $task->assignees()->syncWithoutDetaching([$assigneeId]);
 
-        if ($validated['user_id'] !== $request->user()->id) {
-            $userToNotify = User::find($validated['user_id']);
+        if ($assigneeId !== (int) $request->user()->id) {
+            $userToNotify = User::find($assigneeId);
             $userToNotify?->notify(new TaskAssignedNotification($task, $request->user()));
         }
 

@@ -1,22 +1,55 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import notificationService from '@/services/notificationService'
+import { useToastStore } from '@/stores/toastStore'
 
 export const useNotificationStore = defineStore('notification', () => {
   const notifications = ref([])
   const unreadCount = ref(0)
   const isLoading = ref(false)
+  const isInitialized = ref(false)
 
   async function fetchNotifications() {
     isLoading.value = true
     try {
       const response = await notificationService.getNotifications()
-      notifications.value = response.data || []
-      unreadCount.value = response.unread_count || 0
+      const newItems = response.data || []
+      const newUnreadCount = response.unread_count || 0
+
+      // If already initialized and new unread notifications arrived
+      if (isInitialized.value && newUnreadCount > unreadCount.value) {
+        const existingIds = new Set(notifications.value.map((n) => n.id))
+        const brandNewUnread = newItems.filter((n) => !n.read_at && !existingIds.has(n.id))
+        if (brandNewUnread.length > 0) {
+          try {
+            const toastStore = useToastStore()
+            brandNewUnread.forEach((item) => {
+              if (item.message) {
+                toastStore.info(`🔔 ${item.message}`, 6000)
+              }
+            })
+          } catch {
+            // Toast fallback
+          }
+        }
+      }
+
+      notifications.value = newItems
+      unreadCount.value = newUnreadCount
+      isInitialized.value = true
       return response
+    } catch {
+      return null
     } finally {
       isLoading.value = false
     }
+  }
+
+  function reset() {
+    notifications.value = []
+    unreadCount.value = 0
+    isLoading.value = false
+    isInitialized.value = false
   }
 
   async function markAsRead(id) {
@@ -65,7 +98,9 @@ export const useNotificationStore = defineStore('notification', () => {
     notifications,
     unreadCount,
     isLoading,
+    isInitialized,
     fetchNotifications,
+    reset,
     markAsRead,
     markAllAsRead,
     deleteNotification,

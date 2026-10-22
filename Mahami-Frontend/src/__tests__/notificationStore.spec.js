@@ -90,5 +90,18 @@ describe('notificationStore', () => {
     expect(store.notifications[0].id).toBe('uuid-2')
     expect(store.unreadCount).toBe(0)
   })
+
+  it('reset clears notifications and resets state', () => {
+    const store = useNotificationStore()
+    store.notifications = [{ id: '1' }]
+    store.unreadCount = 5
+    store.isInitialized = true
+
+    store.reset()
+
+    expect(store.notifications).toEqual([])
+    expect(store.unreadCount).toBe(0)
+    expect(store.isInitialized).toBe(false)
+  })
 })
 

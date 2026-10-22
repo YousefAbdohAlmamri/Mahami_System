@@ -48,3 +48,4 @@ class WorkspaceInvitationNotification extends Notification
         ];
     }
 }
+
