@@ -45,8 +45,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::apiResource('workspaces', WorkspaceController::class);
     Route::post('/workspaces/{workspace}/transfer-ownership', [WorkspaceController::class, 'transferOwnership']);
     Route::get('/workspaces/{workspace}/members', [WorkspaceMemberController::class, 'index']);
-    Route::put('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'update']);
-    Route::delete('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'destroy']);
+    Route::post('/workspaces/{workspace}/members/invite', [WorkspaceInvitationController::class, 'store']);
+    Route::put('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'update'])->whereNumber('user');
+    Route::delete('/workspaces/{workspace}/members/{user}', [WorkspaceMemberController::class, 'destroy'])->whereNumber('user');
     Route::get('/workspaces/{workspace}/invitations', [WorkspaceInvitationController::class, 'index']);
     Route::post('/workspaces/{workspace}/invitations', [WorkspaceInvitationController::class, 'store']);
     Route::delete('/workspaces/{workspace}/invitations/{invitation}', [WorkspaceInvitationController::class, 'destroy']);

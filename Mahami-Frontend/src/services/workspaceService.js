@@ -32,7 +32,7 @@ export const workspaceService = {
   },
 
   async inviteMember(workspaceId, data) {
-    const response = await http.post(`/api/workspaces/${workspaceId}/members/invite`, data)
+    const response = await http.post(`/api/workspaces/${workspaceId}/invitations`, data)
     return response.data
   },
 

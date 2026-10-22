@@ -160,7 +160,15 @@ class WorkspaceApiTest extends TestCase
         $workspace = Workspace::factory()->create(['owner_id' => $owner->id]);
         $workspace->members()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
 
-        // 1. Send invite
+        // 1a. Send invite via alias route (/members/invite)
+        $resInviteAlias = $this->actingAs($owner, 'sanctum')->postJson("/api/workspaces/{$workspace->id}/members/invite", [
+            'email' => 'alias_test@example.com',
+            'role' => 'member',
+        ]);
+        $resInviteAlias->assertStatus(201);
+        $this->assertNotEmpty($resInviteAlias->json('data.token'));
+
+        // 1b. Send invite via standard route (/invitations)
         $resInvite = $this->actingAs($owner, 'sanctum')->postJson("/api/workspaces/{$workspace->id}/invitations", [
             'email' => 'invitee@example.com',
             'role' => 'member',

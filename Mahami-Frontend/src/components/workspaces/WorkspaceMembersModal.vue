@@ -65,8 +65,9 @@ async function handleInvite() {
       role: inviteForm.role,
     })
     toast.success(t('invitationSent'))
-    if (res.invitation?.token) {
-      lastInviteLink.value = `${window.location.origin}/invitations/${res.invitation.token}`
+    const token = res?.data?.token || res?.token || res?.invitation?.token
+    if (token) {
+      lastInviteLink.value = `${window.location.origin}/invitations/${token}`
     }
     inviteForm.email = ''
   } catch (err) {
