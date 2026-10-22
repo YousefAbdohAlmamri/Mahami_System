@@ -10,6 +10,7 @@ import WorkspaceModal from '@/components/workspaces/WorkspaceModal.vue'
 import WorkspaceMembersModal from '@/components/workspaces/WorkspaceMembersModal.vue'
 import TeamsOverviewModal from '@/components/teams/TeamsOverviewModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
+import NotificationDropdown from '@/components/common/NotificationDropdown.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -304,6 +305,9 @@ async function handleLogout() {
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
+
+        <!-- Notification Bell Dropdown -->
+        <NotificationDropdown v-if="authStore.isAuthenticated" />
 
         <!-- User menu -->
         <div class="relative ms-1">

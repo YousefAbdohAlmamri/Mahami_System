@@ -71,3 +71,4 @@ class ActivityLogController extends Controller
         return ActivityLogResource::collection($activities);
     }
 }
+

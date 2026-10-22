@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BoardController;
 use App\Http\Controllers\Api\BoardListController;
 use App\Http\Controllers\Api\BoardTeamController;
 use App\Http\Controllers\Api\LabelController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TaskAssigneeController;
 use App\Http\Controllers\Api\TaskAttachmentController;
 use App\Http\Controllers\Api\TaskChecklistController;
@@ -151,4 +152,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Activity Logs
     Route::get('/tasks/{task}/activities', [ActivityLogController::class, 'taskActivities']);
     Route::get('/boards/{board}/activities', [ActivityLogController::class, 'boardActivities']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Phase 5: Notifications & Real-Time Alerts Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 });

@@ -201,10 +201,20 @@
 | `properties` | JSON | NULLABLE | Additional parameters / diffs |
 | `created_at` | TIMESTAMP | NULLABLE, INDEX | Action timestamp |
 
+### 1.20 `notifications` (Phase 5)
+| Column | Type | Attributes | Description |
+|---|---|---|---|
+| `id` | CHAR(36) / UUID | PRIMARY KEY | Unique Notification UUID |
+| `type` | VARCHAR(255) | NOT NULL | Notification class name |
+| `notifiable_type` | VARCHAR(255) | NOT NULL | Polymorphic entity class (`App\Models\User`) |
+| `notifiable_id` | BIGINT UNSIGNED | NOT NULL | Polymorphic entity ID |
+| `data` | TEXT / JSON | NOT NULL | Payload with message, actor, task_id, etc. |
+| `read_at` | TIMESTAMP | NULLABLE | Read timestamp |
+| `created_at` / `updated_at` | TIMESTAMP | NULLABLE | Timestamps |
+*Index:* `INDEX(notifiable_type, notifiable_id)`
+
 ---
 
-## 2. Planned Schema Extensions (Upcoming Phases 5 - 6)
+## 2. Planned Schema Extensions (Upcoming Phases 6 - 7)
 
-### Phase 5 — Real-Time Notifications
-- `notifications`: standard Laravel notification table (`id` UUID, `type`, `notifiable_type`, `notifiable_id`, `data` JSON, `read_at`, `created_at`)
-- `notification_preferences`: `id`, `user_id` (FK), `channel`, `is_enabled`
+### Phase 6 — Dashboard and Reports

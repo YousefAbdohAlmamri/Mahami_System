@@ -176,6 +176,14 @@ export default {
   tabComments: 'Comments',
   tabActivity: 'Activity',
 
+  // Notifications (Phase 5)
+  notifications: 'Notifications',
+  markAllAsRead: 'Mark all as read',
+  noNotifications: 'No notifications at this moment',
+  taskAssignedAlert: 'Task Assigned',
+  mentionAlert: 'You were mentioned',
+  dueAlert: 'Due Date Reminder',
+
   // Common Actions & UI
   save: 'Save',
   saving: 'Saving...',

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -21,7 +22,17 @@ class TaskAssigneeController extends Controller
             'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
 
+        $previousIds = $task->assignees()->pluck('users.id')->all();
         $task->assignees()->sync($validated['user_ids']);
+        $newIds = array_diff($validated['user_ids'], $previousIds);
+        $currentUser = $request->user();
+
+        foreach ($newIds as $newId) {
+            if ($newId !== $currentUser->id) {
+                $userToNotify = User::find($newId);
+                $userToNotify?->notify(new TaskAssignedNotification($task, $currentUser));
+            }
+        }
 
         return response()->json([
             'message' => 'Task assignees updated successfully.',
@@ -38,6 +49,11 @@ class TaskAssigneeController extends Controller
         ]);
 
         $task->assignees()->syncWithoutDetaching([$validated['user_id']]);
+
+        if ($validated['user_id'] !== $request->user()->id) {
+            $userToNotify = User::find($validated['user_id']);
+            $userToNotify?->notify(new TaskAssignedNotification($task, $request->user()));
+        }
 
         return response()->json([
             'message' => 'Assignee added successfully.',

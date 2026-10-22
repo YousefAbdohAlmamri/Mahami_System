@@ -159,3 +159,4 @@ class TaskCollaborationTest extends TestCase
             ->assertJsonPath('data.0.board_id', $this->board->id);
     }
 }
+

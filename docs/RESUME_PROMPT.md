@@ -8,21 +8,20 @@ Continue executing the Mahami Full Team & Project Management Platform implementa
 - Phase 1 (Workspaces and Memberships) is completed and verified.
 - Phase 2 (Teams and Permissions) is completed and verified.
 - Phase 3 (Advanced Projects and Tasks) is completed and verified.
-- Phase 4 (Collaboration: Comments, Mentions, Activity Logs) is completed and verified:
-  - Database: 21 migrations executed cleanly in MariaDB (`task_comments`, `activity_logs`).
-  - Backend: 83/83 Laravel PHPUnit tests passing (345 assertions) in 4.41s.
-  - Frontend: 28/28 Vitest unit & component tests passing across all 7 suites.
-  - Production Build: Vite production build compiles cleanly in 1.50s with 0 errors.
-  - Features: Task comments with edit/delete author permissions, @mentions detection and autocomplete helper, automatic audit trail logging via ActivityLogger, task and board activity feeds, TaskCard comments count badge, and a responsive 3-tab TaskDetailsModal (Details, Comments, Activity Log).
+- Phase 4 (Collaboration: Comments, Mentions, Activity Logs) is completed and verified.
+- Phase 5 (Real-Time Notifications, Queues, and Reminders) is completed and verified:
+  - Database: 22 migrations executed cleanly in MariaDB (`notifications` table).
+  - Backend: 88/88 Laravel PHPUnit tests passing (367 assertions) in 5.08s.
+  - Frontend: 33/33 Vitest unit & component tests passing across all 8 suites in 12.15s.
+  - Production Build: Vite production build compiles in 1.77s with 0 errors.
+  - Features: Notification classes (`TaskAssignedNotification`, `TaskCommentNotification`, `TaskDueReminderNotification`), notifications API (`/api/notifications`, mark read, mark all read, delete), `mahami:send-due-reminders` artisan command, `notificationStore.js`, `NotificationDropdown.vue` in top navbar with unread badge counter and real-time polling.
 - Project documentation is up-to-date in docs/ directory.
 
 ## Next Action:
-- Awaiting user approval to proceed with Phase 5 — Real-Time Notifications, Queues, and Reminders.
-- When approved, implement Phase 5:
-  1. Laravel Notifications table migration (`php artisan notifications:table`).
-  2. In-app notifications API (`/api/notifications`, mark as read, unread count).
-  3. Real-time broadcasting event setup (Laravel Echo / Pusher / Reverb drivers) for instant task updates, new comments, and assignment alerts.
-  4. Scheduled artisan command for due date reminder notifications.
-  5. Frontend Notifications dropdown menu in MainLayout with unread badge counter.
-  6. Backend and frontend tests for notifications and broadcast events.
+- Awaiting user approval to proceed with Phase 6 — Dashboard and Reports.
+- When approved, implement Phase 6:
+  1. Analytics service and repositories calculating workspace and board metrics (completion rate, task status breakdown, priority distribution, member workloads, overdue tasks).
+  2. API endpoints: `GET /api/workspaces/{workspace}/analytics` and `GET /api/boards/{board}/analytics`.
+  3. Frontend analytics store and Dashboard page / modal with visual charts and metrics cards.
+  4. Backend and frontend tests for metrics calculation and dashboard rendering.
 ```

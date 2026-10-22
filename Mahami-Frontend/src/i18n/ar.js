@@ -176,6 +176,14 @@ export default {
   tabComments: 'التعليقات',
   tabActivity: 'سجل النشاط',
 
+  // Notifications (Phase 5)
+  notifications: 'الإشعارات',
+  markAllAsRead: 'تحديد الكل كمقروء',
+  noNotifications: 'لا توجد إشعارات لديك حالياً',
+  taskAssignedAlert: 'تم تعيينك في مهمة',
+  mentionAlert: 'تمت الإشارة إليك',
+  dueAlert: 'تنبيه موعد استحقاق',
+
   // Common Actions & UI
   save: 'حفظ',
   saving: 'جاري الحفظ...',
