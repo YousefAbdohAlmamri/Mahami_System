@@ -50,3 +50,4 @@ class SendTaskDueReminders extends Command
         return Command::SUCCESS;
     }
 }
+

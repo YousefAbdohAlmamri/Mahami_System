@@ -134,3 +134,4 @@ class NotificationsTest extends TestCase
         $this->assertEquals('task_due_reminder', $this->userB->notifications()->first()->data['type']);
     }
 }
+

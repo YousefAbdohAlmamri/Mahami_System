@@ -11,6 +11,7 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import AppButton from '@/components/common/AppButton.vue'
 import TeamsOverviewModal from '@/components/teams/TeamsOverviewModal.vue'
+import AnalyticsModal from '@/components/analytics/AnalyticsModal.vue'
 
 const boardStore = useBoardStore()
 const workspaceStore = useWorkspaceStore()
@@ -22,6 +23,7 @@ const showFormModal = ref(false)
 const selectedBoard = ref(null)
 const isSubmitting = ref(false)
 const showTeamsModal = ref(false)
+const showWorkspaceAnalyticsModal = ref(false)
 
 const showDeleteConfirm = ref(false)
 const boardToDelete = ref(null)
@@ -153,6 +155,18 @@ async function handleDeleteBoard() {
             @click="showTeamsModal = true"
           >
             {{ t('teams') }}
+          </button>
+          <button
+            type="button"
+            class="px-2.5 py-1 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+            @click="showWorkspaceAnalyticsModal = true"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            {{ t('analytics') }}
           </button>
         </div>
       </div>
@@ -310,6 +324,14 @@ async function handleDeleteBoard() {
       v-if="showTeamsModal && workspaceStore.currentWorkspace"
       :workspace="workspaceStore.currentWorkspace"
       @close="showTeamsModal = false"
+    />
+
+    <!-- Workspace Analytics Modal -->
+    <AnalyticsModal
+      v-if="showWorkspaceAnalyticsModal && workspaceStore.currentWorkspaceId"
+      :workspace-id="workspaceStore.currentWorkspaceId"
+      :title="`${t('workspaceAnalytics')}: ${workspaceStore.currentWorkspace?.name}`"
+      @close="showWorkspaceAnalyticsModal = false"
     />
   </div>
 </template>

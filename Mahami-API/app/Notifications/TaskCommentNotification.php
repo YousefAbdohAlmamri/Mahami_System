@@ -44,3 +44,4 @@ class TaskCommentNotification extends Notification
         ];
     }
 }
+

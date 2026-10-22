@@ -71,3 +71,4 @@ export const useNotificationStore = defineStore('notification', () => {
     deleteNotification,
   }
 })
+

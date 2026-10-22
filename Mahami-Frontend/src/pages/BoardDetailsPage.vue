@@ -12,6 +12,7 @@ import TaskForm from '@/components/tasks/TaskForm.vue'
 import TaskDetailsModal from '@/components/tasks/TaskDetailsModal.vue'
 import BoardForm from '@/components/boards/BoardForm.vue'
 import BoardTeamsModal from '@/components/teams/BoardTeamsModal.vue'
+import AnalyticsModal from '@/components/analytics/AnalyticsModal.vue'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import AppButton from '@/components/common/AppButton.vue'
@@ -46,6 +47,7 @@ const selectedTaskForDetails = ref(null)
 const showEditBoardModal = ref(false)
 const isSubmittingBoard = ref(false)
 const showBoardTeamsModal = ref(false)
+const showAnalyticsModal = ref(false)
 
 const showDeleteConfirm = ref(false)
 const deleteAction = ref({ type: '', item: null, title: '', message: '' })
@@ -343,6 +345,20 @@ async function executeDelete() {
           <span class="hidden md:inline">{{ t('teams') }}</span>
         </button>
 
+        <!-- Analytics & Reports -->
+        <button
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          :title="t('analytics')"
+          @click="showAnalyticsModal = true"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg>
+          <span class="hidden md:inline">{{ t('analytics') }}</span>
+        </button>
+
         <button
           class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           :title="t('editBoard')"
@@ -455,6 +471,14 @@ async function executeDelete() {
       v-if="showBoardTeamsModal && boardStore.currentBoard"
       :board="boardStore.currentBoard"
       @close="showBoardTeamsModal = false"
+    />
+
+    <!-- Board Analytics & Reports Modal -->
+    <AnalyticsModal
+      v-if="showAnalyticsModal && boardStore.currentBoard"
+      :board-id="boardStore.currentBoard.id"
+      :title="`${t('boardAnalytics')}: ${boardStore.currentBoard.title}`"
+      @close="showAnalyticsModal = false"
     />
 
     <ConfirmDialog

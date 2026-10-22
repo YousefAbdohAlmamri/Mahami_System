@@ -37,3 +37,4 @@ class TaskAssignedNotification extends Notification
         ];
     }
 }
+

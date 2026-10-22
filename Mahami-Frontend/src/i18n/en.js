@@ -184,6 +184,19 @@ export default {
   mentionAlert: 'You were mentioned',
   dueAlert: 'Due Date Reminder',
 
+  // Dashboard & Analytics (Phase 6)
+  analytics: 'Analytics & Reports',
+  boardAnalytics: 'Board Analytics',
+  workspaceAnalytics: 'Workspace Analytics',
+  completionRate: 'Completion Rate',
+  totalTasks: 'Total Tasks',
+  completedTasks: 'Completed Tasks',
+  overdueTasks: 'Overdue Tasks',
+  priorityDistribution: 'Priority Breakdown',
+  statusDistribution: 'Status Breakdown',
+  memberWorkload: 'Team Workload',
+  noDataAnalytics: 'Not enough data to display analytics yet',
+
   // Common Actions & UI
   save: 'Save',
   saving: 'Saving...',

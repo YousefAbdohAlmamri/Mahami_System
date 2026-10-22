@@ -184,6 +184,19 @@ export default {
   mentionAlert: 'تمت الإشارة إليك',
   dueAlert: 'تنبيه موعد استحقاق',
 
+  // Dashboard & Analytics (Phase 6)
+  analytics: 'التقارير والمؤشرات',
+  boardAnalytics: 'تحليلات اللوحة',
+  workspaceAnalytics: 'تحليلات مساحة العمل',
+  completionRate: 'نسبة الإنجاز',
+  totalTasks: 'إجمالي المهام',
+  completedTasks: 'المهام المنجزة',
+  overdueTasks: 'المهام المتأخرة',
+  priorityDistribution: 'توزيع الأولويات',
+  statusDistribution: 'توزيع المراحل',
+  memberWorkload: 'أعباء عمل الفريق',
+  noDataAnalytics: 'لا تتوفر بيانات كافية لإظهار التحليلات حالياً',
+
   // Common Actions & UI
   save: 'حفظ',
   saving: 'جاري الحفظ...',

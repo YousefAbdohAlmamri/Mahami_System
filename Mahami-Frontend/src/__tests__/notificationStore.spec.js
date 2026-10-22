@@ -91,3 +91,4 @@ describe('notificationStore', () => {
     expect(store.unreadCount).toBe(0)
   })
 })
+

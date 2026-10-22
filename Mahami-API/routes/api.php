@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ActivityLogController;
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BoardController;
 use App\Http\Controllers\Api\BoardListController;
@@ -162,4 +163,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Phase 6: Analytics & Dashboard Reports Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/boards/{board}/analytics', [AnalyticsController::class, 'board']);
+    Route::get('/workspaces/{workspace}/analytics', [AnalyticsController::class, 'workspace']);
 });
