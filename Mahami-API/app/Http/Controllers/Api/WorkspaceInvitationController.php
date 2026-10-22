@@ -8,6 +8,8 @@ use App\Http\Resources\WorkspaceInvitationResource;
 use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
+use App\Notifications\WorkspaceInvitationNotification;
+use App\Notifications\WorkspaceInvitationResponseNotification;
 use App\Repositories\Contracts\WorkspaceInvitationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,6 +60,11 @@ class WorkspaceInvitationController extends Controller
             ->update(['cancelled_at' => now()]);
 
         $invitation = $this->invitationRepository->create($workspace, $request->user(), $request->validated());
+
+        // Notify existing registered user
+        if ($existingUser) {
+            $existingUser->notify(new WorkspaceInvitationNotification($invitation, $workspace, $request->user()));
+        }
 
         return (new WorkspaceInvitationResource($invitation))
             ->response()
@@ -118,6 +125,21 @@ class WorkspaceInvitationController extends Controller
         // Add user as member
         $this->invitationRepository->accept($invitation, $user);
 
+        // Mark corresponding notification as read
+        $user->notifications()
+            ->where('data->type', 'workspace_invitation')
+            ->where('data->token', $token)
+            ->update(['read_at' => now()]);
+
+        // Notify inviter
+        if ($invitation->inviter) {
+            $invitation->inviter->notify(new WorkspaceInvitationResponseNotification(
+                workspace: $invitation->workspace,
+                responder: $user,
+                accepted: true
+            ));
+        }
+
         return response()->json([
             'message' => 'Invitation accepted successfully',
             'workspace_id' => $invitation->workspace_id,
@@ -138,6 +160,25 @@ class WorkspaceInvitationController extends Controller
         }
 
         $this->invitationRepository->decline($invitation);
+
+        $user = $request->user();
+
+        if ($user) {
+            $user->notifications()
+                ->where('data->type', 'workspace_invitation')
+                ->where('data->token', $token)
+                ->update(['read_at' => now()]);
+        }
+
+        // Notify inviter
+        if ($invitation->inviter) {
+            $invitation->inviter->notify(new WorkspaceInvitationResponseNotification(
+                workspace: $invitation->workspace,
+                responder: $user,
+                accepted: false,
+                declinedEmail: $invitation->email
+            ));
+        }
 
         return response()->json([
             'message' => 'Invitation declined successfully',

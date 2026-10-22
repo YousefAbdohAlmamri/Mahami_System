@@ -177,6 +177,12 @@ class WorkspaceApiTest extends TestCase
         $token = $resInvite->json('data.token');
         $this->assertNotEmpty($token);
 
+        // Verify that registered user received an in-app notification
+        $this->assertEquals(1, $invitee->unreadNotifications()->count());
+        $invNotification = $invitee->unreadNotifications()->first();
+        $this->assertEquals('workspace_invitation', $invNotification->data['type']);
+        $this->assertEquals($token, $invNotification->data['token']);
+
         // 2. Cannot send duplicate invite if already active member
         // (will test after accepting)
 
@@ -198,11 +204,37 @@ class WorkspaceApiTest extends TestCase
             'status' => 'active',
         ]);
 
+        // Assert invitee notification is now marked as read
+        $this->assertEquals(0, $invitee->unreadNotifications()->count());
+
+        // Assert inviter (owner) received acceptance notification
+        $this->assertTrue($owner->notifications()->where('data->type', 'workspace_invitation_response')->exists());
+        $responseNotif = $owner->notifications()->where('data->type', 'workspace_invitation_response')->first();
+        $this->assertTrue($responseNotif->data['accepted']);
+
         // 5. Token cannot be reused
         $resReuse = $this->actingAs($invitee, 'sanctum')->postJson("/api/invitations/{$token}/accept");
         $resReuse->assertStatus(422);
 
-        // 6. Inviting again now returns 422 because user is already a member
+        // 6. Test declining invitation flow
+        $declinedUser = User::factory()->create(['email' => 'declined@example.com']);
+        $resDeclinedInvite = $this->actingAs($owner, 'sanctum')->postJson("/api/workspaces/{$workspace->id}/invitations", [
+            'email' => 'declined@example.com',
+            'role' => 'guest',
+        ]);
+        $resDeclinedInvite->assertStatus(201);
+        $declinedToken = $resDeclinedInvite->json('data.token');
+
+        $this->actingAs($declinedUser, 'sanctum')->postJson("/api/invitations/{$declinedToken}/decline")->assertOk();
+        $this->assertDatabaseMissing('workspace_members', [
+            'workspace_id' => $workspace->id,
+            'user_id' => $declinedUser->id,
+        ]);
+        // Owner received decline notification
+        $declineNotif = $owner->notifications()->where('data->type', 'workspace_invitation_response')->where('data->accepted', false)->first();
+        $this->assertNotNull($declineNotif);
+
+        // 7. Inviting again now returns 422 because user is already a member
         $resDup = $this->actingAs($owner, 'sanctum')->postJson("/api/workspaces/{$workspace->id}/invitations", [
             'email' => 'invitee@example.com',
             'role' => 'admin',

@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\WorkspaceInvitation;
+use App\Notifications\WorkspaceInvitationNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,6 +28,21 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        // Check if there are pending invitations for this newly registered email
+        $pendingInvites = WorkspaceInvitation::where('email', strtolower($user->email))
+            ->whereNull('accepted_at')
+            ->whereNull('declined_at')
+            ->whereNull('cancelled_at')
+            ->where('expires_at', '>', now())
+            ->with(['workspace', 'inviter'])
+            ->get();
+
+        foreach ($pendingInvites as $invite) {
+            if ($invite->workspace && $invite->inviter) {
+                $user->notify(new WorkspaceInvitationNotification($invite, $invite->workspace, $invite->inviter));
+            }
+        }
 
         if ($request->hasSession()) {
             $request->session()->regenerate();

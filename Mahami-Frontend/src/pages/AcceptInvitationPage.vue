@@ -31,8 +31,12 @@ onMounted(async () => {
 
   try {
     const res = await workspaceService.getInvitation(token)
-    if (res.valid) {
-      invitation.value = res.invitation
+    const data = res.data || res.invitation || res
+    if (data && data.is_valid !== false) {
+      invitation.value = {
+        ...data,
+        inviter_name: data.inviter?.name || data.inviter_name,
+      }
     } else {
       error.value = res.message || t('invalidInvitation')
     }
@@ -49,8 +53,9 @@ async function handleAccept() {
     const res = await workspaceService.acceptInvitation(token)
     toast.success(t('invitationAccepted'))
     await workspaceStore.fetchWorkspaces()
-    if (res.invitation?.workspace_id) {
-      workspaceStore.setActiveWorkspace(res.invitation.workspace_id)
+    const targetWsId = res.workspace_id || res.invitation?.workspace_id || invitation.value?.workspace_id
+    if (targetWsId) {
+      workspaceStore.setActiveWorkspace(targetWsId)
     }
     router.push({ name: 'boards' })
   } catch (err) {
