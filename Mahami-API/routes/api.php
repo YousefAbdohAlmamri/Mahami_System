@@ -26,13 +26,13 @@ use Illuminate\Support\Facades\Route;
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
-Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
-Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+Route::post('/register', [AuthController::class, 'register'])->middleware(['guest', 'throttle:auth']);
+Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:auth']);
 
 // Public invitation preview by token
-Route::get('/invitations/{token}', [WorkspaceInvitationController::class, 'showByToken']);
+Route::get('/invitations/{token}', [WorkspaceInvitationController::class, 'showByToken'])->middleware('throttle:api');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
     Route::get('/me', [AuthController::class, 'me']);

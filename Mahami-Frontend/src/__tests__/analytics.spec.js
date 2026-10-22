@@ -54,3 +54,4 @@ describe('AnalyticsModal Component', () => {
     expect(wrapper.text()).toContain('Alice') // member workload
   })
 })
+
