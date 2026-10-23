@@ -65,5 +65,18 @@ interface BoardListRepositoryInterface
      * @return int
      */
     public function getNextPosition(int $boardId): int;
-}
 
+    public function find(int $id): ?BoardList;
+
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail(int $id): BoardList;
+
+    /**
+     * Count how many of the given list ids belong to the board.
+     *
+     * @param  array<int, int|string>  $ids
+     */
+    public function countInBoard(int $boardId, array $ids): int;
+}

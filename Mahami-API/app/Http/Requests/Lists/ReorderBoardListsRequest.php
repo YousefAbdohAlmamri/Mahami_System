@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Lists;
 
 use App\Models\Board;
-use App\Models\BoardList;
+use App\Repositories\Contracts\BoardListRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -41,9 +41,8 @@ class ReorderBoardListsRequest extends FormRequest
 
             $orderedIds = $this->input('ordered_ids', []);
             if (!empty($orderedIds) && $boardId) {
-                $validCount = BoardList::where('board_id', $boardId)
-                    ->whereIn('id', $orderedIds)
-                    ->count();
+                $validCount = app(BoardListRepositoryInterface::class)
+                    ->countInBoard((int) $boardId, $orderedIds);
 
                 if ($validCount !== count($orderedIds)) {
                     $validator->errors()->add(

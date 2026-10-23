@@ -23,7 +23,7 @@ class BoardTeamController extends Controller
     {
         Gate::authorize('view', $board);
 
-        return BoardTeamResource::collection($board->teams);
+        return BoardTeamResource::collection($this->teamRepository->getForBoard($board));
     }
 
     public function store(AssignBoardTeamRequest $request, Board $board): JsonResponse
@@ -33,7 +33,7 @@ class BoardTeamController extends Controller
         $teamId = (int) $request->validated('team_id');
         $permission = $request->validated('permission', 'editor');
 
-        $team = Team::findOrFail($teamId);
+        $team = $this->teamRepository->findOrFail($teamId);
 
         // Verify team belongs to the board's workspace
         if ((int) $team->workspace_id !== (int) $board->workspace_id) {
@@ -44,7 +44,7 @@ class BoardTeamController extends Controller
 
         $this->teamRepository->assignBoard($team->id, $board->id, $permission);
 
-        $assigned = $board->teams()->where('workspace_teams.id', $team->id)->first();
+        $assigned = $this->teamRepository->findBoardTeam($board, (int) $team->id);
 
         return response()->json([
             'message' => 'Team assigned to board successfully.',
@@ -62,7 +62,7 @@ class BoardTeamController extends Controller
 
         $this->teamRepository->assignBoard($team->id, $board->id, $validated['permission']);
 
-        $assigned = $board->teams()->where('workspace_teams.id', $team->id)->first();
+        $assigned = $this->teamRepository->findBoardTeam($board, (int) $team->id);
 
         return response()->json([
             'message' => 'Team board permission updated successfully.',

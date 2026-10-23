@@ -86,5 +86,14 @@ class EloquentBoardRepository implements BoardRepositoryInterface
     {
         return (bool) $board->delete();
     }
-}
 
+    public function findOrFailWithWorkspace(int $id): Board
+    {
+        return $this->model->with('workspace')->findOrFail($id);
+    }
+
+    public function loadForAnalytics(Board $board): Board
+    {
+        return $board->load(['lists.tasks.assignees', 'lists.tasks.checklists.items']);
+    }
+}

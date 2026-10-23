@@ -7,8 +7,8 @@ use App\Http\Requests\StoreWorkspaceRequest;
 use App\Http\Requests\TransferWorkspaceOwnershipRequest;
 use App\Http\Requests\UpdateWorkspaceRequest;
 use App\Http\Resources\WorkspaceResource;
-use App\Models\User;
 use App\Models\Workspace;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\WorkspaceRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Gate;
 class WorkspaceController extends Controller
 {
     public function __construct(
-        protected WorkspaceRepositoryInterface $workspaceRepository
+        protected WorkspaceRepositoryInterface $workspaceRepository,
+        protected UserRepositoryInterface $userRepository
     ) {}
 
     /**
@@ -87,10 +88,10 @@ class WorkspaceController extends Controller
     {
         Gate::authorize('transferOwnership', $workspace);
 
-        $newOwner = User::findOrFail($request->validated()['new_owner_id']);
+        $newOwner = $this->userRepository->findOrFail((int) $request->validated()['new_owner_id']);
 
         // Check if new owner is an active member of this workspace
-        if (!$workspace->members()->where('users.id', $newOwner->id)->where('status', 'active')->exists()) {
+        if (!$this->workspaceRepository->isActiveMember($workspace, (int) $newOwner->id)) {
             return response()->json([
                 'message' => 'New owner must be an active member of this workspace',
             ], 422);

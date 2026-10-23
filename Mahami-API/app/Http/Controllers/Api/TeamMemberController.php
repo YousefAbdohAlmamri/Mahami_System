@@ -8,6 +8,8 @@ use App\Http\Resources\TeamMemberResource;
 use App\Models\Team;
 use App\Models\User;
 use App\Repositories\Contracts\TeamRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\WorkspaceRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -16,14 +18,16 @@ use Illuminate\Support\Facades\Gate;
 class TeamMemberController extends Controller
 {
     public function __construct(
-        protected TeamRepositoryInterface $teamRepository
+        protected TeamRepositoryInterface $teamRepository,
+        protected UserRepositoryInterface $userRepository,
+        protected WorkspaceRepositoryInterface $workspaceRepository
     ) {}
 
     public function index(Team $team): AnonymousResourceCollection
     {
         Gate::authorize('view', $team);
 
-        return TeamMemberResource::collection($team->members);
+        return TeamMemberResource::collection($this->teamRepository->getMembers($team));
     }
 
     public function store(AddTeamMemberRequest $request, Team $team): JsonResponse
@@ -31,12 +35,11 @@ class TeamMemberController extends Controller
         Gate::authorize('manageMembers', $team);
 
         $userId = (int) $request->validated('user_id');
-        $targetUser = User::findOrFail($userId);
+        $targetUser = $this->userRepository->findOrFail($userId);
 
         // Verify target user is a member/owner of the workspace
-        $workspace = $team->workspace;
-        $isWorkspaceMember = $workspace->owner_id === $targetUser->id ||
-            $workspace->members()->where('users.id', $targetUser->id)->where('status', 'active')->exists();
+        $workspace = $this->teamRepository->getWorkspace($team);
+        $isWorkspaceMember = $this->workspaceRepository->isOwnerOrActiveMember($workspace, (int) $targetUser->id);
 
         if (!$isWorkspaceMember) {
             return response()->json([
@@ -47,7 +50,7 @@ class TeamMemberController extends Controller
         $role = $request->validated('role', 'member');
         $this->teamRepository->addMember($team->id, $userId, $role);
 
-        $updatedMember = $team->members()->where('users.id', $userId)->first();
+        $updatedMember = $this->teamRepository->findMember($team, $userId);
 
         return response()->json([
             'message' => 'Member added to team successfully.',
@@ -70,7 +73,7 @@ class TeamMemberController extends Controller
         }
 
         $this->teamRepository->updateMemberRole($team->id, $user->id, $validated['role']);
-        $updatedMember = $team->members()->where('users.id', $user->id)->first();
+        $updatedMember = $this->teamRepository->findMember($team, (int) $user->id);
 
         return response()->json([
             'message' => 'Team member role updated successfully.',

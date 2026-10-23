@@ -52,5 +52,36 @@ interface WorkspaceRepositoryInterface
      * Remove member from workspace.
      */
     public function removeMember(Workspace $workspace, User $user): void;
-}
 
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail(int $id): Workspace;
+
+    /**
+     * Members of the workspace (id, name, email + role/status/created_at pivot).
+     */
+    public function getMembers(Workspace $workspace): Collection;
+
+    public function countMembers(Workspace $workspace): int;
+
+    /**
+     * Is the user a member of the workspace (any status)?
+     */
+    public function hasMember(Workspace $workspace, int $userId): bool;
+
+    /**
+     * Is the user an ACTIVE member of the workspace?
+     */
+    public function isActiveMember(Workspace $workspace, int $userId): bool;
+
+    /**
+     * Is the user the workspace owner or an active member?
+     */
+    public function isOwnerOrActiveMember(Workspace $workspace, int $userId): bool;
+
+    /**
+     * Boards of the workspace with lists.tasks.assignees loaded (for analytics).
+     */
+    public function getBoardsForAnalytics(Workspace $workspace): Collection;
+}

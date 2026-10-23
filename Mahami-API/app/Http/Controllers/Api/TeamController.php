@@ -43,7 +43,7 @@ class TeamController extends Controller
 
         return response()->json([
             'message' => 'Team created successfully.',
-            'data' => new TeamResource($team->load(['creator', 'members'])),
+            'data' => new TeamResource($this->teamRepository->loadRelations($team, ['creator', 'members'])),
         ], 201);
     }
 
@@ -51,7 +51,7 @@ class TeamController extends Controller
     {
         Gate::authorize('view', $team);
 
-        return new TeamResource($team->load(['workspace', 'creator', 'members', 'boards']));
+        return new TeamResource($this->teamRepository->loadRelations($team, ['workspace', 'creator', 'members', 'boards']));
     }
 
     public function update(UpdateTeamRequest $request, Team $team): JsonResponse

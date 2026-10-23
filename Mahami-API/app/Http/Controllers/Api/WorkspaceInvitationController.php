@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InviteWorkspaceMemberRequest;
 use App\Http\Resources\WorkspaceInvitationResource;
-use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceInvitation;
 use App\Notifications\WorkspaceInvitationNotification;
 use App\Notifications\WorkspaceInvitationResponseNotification;
+use App\Repositories\Contracts\NotificationRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\WorkspaceInvitationRepositoryInterface;
+use App\Repositories\Contracts\WorkspaceRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -19,7 +21,10 @@ use Illuminate\Support\Facades\Gate;
 class WorkspaceInvitationController extends Controller
 {
     public function __construct(
-        protected WorkspaceInvitationRepositoryInterface $invitationRepository
+        protected WorkspaceInvitationRepositoryInterface $invitationRepository,
+        protected UserRepositoryInterface $userRepository,
+        protected WorkspaceRepositoryInterface $workspaceRepository,
+        protected NotificationRepositoryInterface $notificationRepository
     ) {}
 
     /**
@@ -44,20 +49,15 @@ class WorkspaceInvitationController extends Controller
         $email = strtolower(trim($request->validated()['email']));
 
         // Check if user is already a member
-        $existingUser = User::where('email', $email)->first();
-        if ($existingUser && $workspace->members()->where('users.id', $existingUser->id)->exists()) {
+        $existingUser = $this->userRepository->findByEmail($email);
+        if ($existingUser && $this->workspaceRepository->hasMember($workspace, (int) $existingUser->id)) {
             return response()->json([
                 'message' => 'User is already a member of this workspace',
             ], 422);
         }
 
         // Cancel previous pending invites for same email
-        $workspace->invitations()
-            ->where('email', $email)
-            ->whereNull('accepted_at')
-            ->whereNull('declined_at')
-            ->whereNull('cancelled_at')
-            ->update(['cancelled_at' => now()]);
+        $this->invitationRepository->cancelPendingForEmail($workspace, $email);
 
         $invitation = $this->invitationRepository->create($workspace, $request->user(), $request->validated());
 
@@ -126,10 +126,7 @@ class WorkspaceInvitationController extends Controller
         $this->invitationRepository->accept($invitation, $user);
 
         // Mark corresponding notification as read
-        $user->notifications()
-            ->where('data->type', 'workspace_invitation')
-            ->where('data->token', $token)
-            ->update(['read_at' => now()]);
+        $this->notificationRepository->markInvitationNotificationsRead($user, $token);
 
         // Notify inviter
         if ($invitation->inviter) {
@@ -164,10 +161,7 @@ class WorkspaceInvitationController extends Controller
         $user = $request->user();
 
         if ($user) {
-            $user->notifications()
-                ->where('data->type', 'workspace_invitation')
-                ->where('data->token', $token)
-                ->update(['read_at' => now()]);
+            $this->notificationRepository->markInvitationNotificationsRead($user, $token);
         }
 
         // Notify inviter

@@ -58,5 +58,16 @@ interface BoardRepositoryInterface
      * @return bool
      */
     public function delete(Board $board): bool;
-}
 
+    /**
+     * Find a board (with its workspace) or fail with a 404.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFailWithWorkspace(int $id): Board;
+
+    /**
+     * Eager load everything the analytics service needs for a board.
+     */
+    public function loadForAnalytics(Board $board): Board;
+}

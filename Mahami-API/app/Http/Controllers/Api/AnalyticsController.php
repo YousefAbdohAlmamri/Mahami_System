@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Board;
-use App\Models\Workspace;
+use App\Repositories\Contracts\BoardRepositoryInterface;
+use App\Repositories\Contracts\WorkspaceRepositoryInterface;
 use App\Services\AnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,15 +12,17 @@ use Illuminate\Http\Request;
 class AnalyticsController extends Controller
 {
     public function __construct(
-        protected AnalyticsService $analyticsService
+        protected AnalyticsService $analyticsService,
+        protected BoardRepositoryInterface $boardRepository,
+        protected WorkspaceRepositoryInterface $workspaceRepository
     ) {}
 
     /**
-     * Get analytics metrics for a specific board.
+     * Get analytics for a board.
      */
     public function board(Request $request, int $boardId): JsonResponse
     {
-        $board = Board::with('workspace')->findOrFail($boardId);
+        $board = $this->boardRepository->findOrFailWithWorkspace($boardId);
         $user = $request->user();
 
         if ($board->user_id !== $user->id) {
@@ -41,11 +43,11 @@ class AnalyticsController extends Controller
     }
 
     /**
-     * Get analytics metrics for a workspace.
+     * Get analytics for a workspace.
      */
     public function workspace(Request $request, int $workspaceId): JsonResponse
     {
-        $workspace = Workspace::findOrFail($workspaceId);
+        $workspace = $this->workspaceRepository->findOrFail($workspaceId);
         $user = $request->user();
 
         if ($workspace->owner_id !== $user->id && !$workspace->hasMemberRole($user, ['owner', 'admin', 'member'])) {
@@ -59,4 +61,3 @@ class AnalyticsController extends Controller
         ]);
     }
 }
-

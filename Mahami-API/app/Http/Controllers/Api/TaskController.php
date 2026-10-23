@@ -10,6 +10,7 @@ use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\BoardList;
 use App\Models\Task;
+use App\Repositories\Contracts\BoardListRepositoryInterface;
 use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,7 +19,8 @@ use Illuminate\Support\Facades\Gate;
 class TaskController extends Controller
 {
     public function __construct(
-        protected TaskRepositoryInterface $taskRepository
+        protected TaskRepositoryInterface $taskRepository,
+        protected BoardListRepositoryInterface $boardListRepository
     ) {}
 
     /**
@@ -85,7 +87,7 @@ class TaskController extends Controller
      */
     public function move(MoveTaskRequest $request, Task $task): TaskResource
     {
-        $targetList = BoardList::findOrFail((int) $request->validated('target_list_id'));
+        $targetList = $this->boardListRepository->findOrFail((int) $request->validated('target_list_id'));
 
         Gate::authorize('move', [$task, $targetList]);
 
@@ -107,9 +109,7 @@ class TaskController extends Controller
 
         $this->taskRepository->reorder((int) $list->id, $request->validated('ordered_ids'));
 
-        $orderedTasks = Task::where('board_list_id', $list->id)
-            ->orderBy('position')
-            ->get();
+        $orderedTasks = $this->taskRepository->getForList((int) $list->id);
 
         return TaskResource::collection($orderedTasks);
     }

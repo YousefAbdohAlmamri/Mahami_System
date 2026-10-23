@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Tasks;
 
 use App\Models\BoardList;
-use App\Models\Task;
+use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -41,9 +41,8 @@ class ReorderTasksRequest extends FormRequest
 
             $orderedIds = $this->input('ordered_ids', []);
             if (!empty($orderedIds) && $listId) {
-                $validCount = Task::where('board_list_id', $listId)
-                    ->whereIn('id', $orderedIds)
-                    ->count();
+                $validCount = app(TaskRepositoryInterface::class)
+                    ->countInList((int) $listId, $orderedIds);
 
                 if ($validCount !== count($orderedIds)) {
                     $validator->errors()->add(

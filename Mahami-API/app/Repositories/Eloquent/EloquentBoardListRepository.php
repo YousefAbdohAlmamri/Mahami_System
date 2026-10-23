@@ -67,5 +67,22 @@ class EloquentBoardListRepository implements BoardListRepositoryInterface
         $max = $this->model->where('board_id', $boardId)->max('position');
         return is_null($max) ? 0 : (int) $max + 1;
     }
-}
 
+    public function find(int $id): ?BoardList
+    {
+        return $this->model->find($id);
+    }
+
+    public function findOrFail(int $id): BoardList
+    {
+        return $this->model->findOrFail($id);
+    }
+
+    public function countInBoard(int $boardId, array $ids): int
+    {
+        return $this->model
+            ->where('board_id', $boardId)
+            ->whereIn('id', $ids)
+            ->count();
+    }
+}

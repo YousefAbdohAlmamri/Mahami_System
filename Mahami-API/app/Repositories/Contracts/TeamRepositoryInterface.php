@@ -4,6 +4,9 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Board;
+use App\Models\User;
+use App\Models\Workspace;
 
 interface TeamRepositoryInterface
 {
@@ -56,4 +59,33 @@ interface TeamRepositoryInterface
      * Remove a board from a team.
      */
     public function removeBoard(int $teamId, int $boardId): void;
+
+    /**
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findOrFail(int $id): Team;
+
+    /**
+     * Teams assigned to a board (with their board permission pivot).
+     */
+    public function getForBoard(Board $board): Collection;
+
+    /**
+     * A single team assigned to the board, or null when it is not assigned.
+     */
+    public function findBoardTeam(Board $board, int $teamId): ?Team;
+
+    public function getMembers(Team $team): Collection;
+
+    /**
+     * A single member of the team (with pivot), or null when not a member.
+     */
+    public function findMember(Team $team, int $userId): ?User;
+
+    /**
+     * @param  array<int, string>  $relations
+     */
+    public function loadRelations(Team $team, array $relations): Team;
+
+    public function getWorkspace(Team $team): Workspace;
 }

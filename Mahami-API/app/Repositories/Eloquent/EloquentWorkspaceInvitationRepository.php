@@ -66,5 +66,25 @@ class EloquentWorkspaceInvitationRepository implements WorkspaceInvitationReposi
     {
         $invitation->update(['cancelled_at' => now()]);
     }
-}
 
+    public function cancelPendingForEmail(Workspace $workspace, string $email): int
+    {
+        return $workspace->invitations()
+            ->where('email', $email)
+            ->whereNull('accepted_at')
+            ->whereNull('declined_at')
+            ->whereNull('cancelled_at')
+            ->update(['cancelled_at' => now()]);
+    }
+
+    public function pendingForEmail(string $email): Collection
+    {
+        return WorkspaceInvitation::where('email', strtolower($email))
+            ->whereNull('accepted_at')
+            ->whereNull('declined_at')
+            ->whereNull('cancelled_at')
+            ->where('expires_at', '>', now())
+            ->with(['workspace', 'inviter'])
+            ->get();
+    }
+}

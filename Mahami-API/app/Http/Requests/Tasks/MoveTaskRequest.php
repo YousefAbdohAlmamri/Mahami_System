@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Tasks;
 
-use App\Models\BoardList;
 use App\Models\Task;
+use App\Repositories\Contracts\BoardListRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -40,7 +40,7 @@ class MoveTaskRequest extends FormRequest
             $targetListId = (int) $this->input('target_list_id');
 
             if ($task instanceof Task && $targetListId) {
-                $targetList = BoardList::find($targetListId);
+                $targetList = app(BoardListRepositoryInterface::class)->find($targetListId);
 
                 if ($targetList && (int) $task->list->board_id !== (int) $targetList->board_id) {
                     $validator->errors()->add(

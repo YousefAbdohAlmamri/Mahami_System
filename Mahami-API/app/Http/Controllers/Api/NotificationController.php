@@ -3,22 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Contracts\NotificationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    public function __construct(
+        protected NotificationRepositoryInterface $notificationRepository
+    ) {}
+
     /**
-     * Get recent notifications and unread count for current user.
+     * Get the latest notifications for the authenticated user.
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        $notifications = $user->notifications()
-            ->latest()
-            ->limit(40)
-            ->get()
+        $notifications = $this->notificationRepository->latestForUser($user, 40)
             ->map(function ($n) {
                 return [
                     'id' => $n->id,
@@ -40,24 +42,23 @@ class NotificationController extends Controller
             });
 
         return response()->json([
-            'unread_count' => $user->unreadNotifications()->count(),
+            'unread_count' => $this->notificationRepository->unreadCount($user),
             'data' => $notifications,
         ]);
     }
 
     /**
-     * Mark a specific notification as read.
+     * Mark a notification as read.
      */
     public function markAsRead(Request $request, string $id): JsonResponse
     {
         $user = $request->user();
-        $notification = $user->notifications()->findOrFail($id);
-
-        $notification->markAsRead();
+        $notification = $this->notificationRepository->findForUserOrFail($user, $id);
+        $this->notificationRepository->markAsRead($notification);
 
         return response()->json([
             'message' => 'Notification marked as read',
-            'unread_count' => $user->unreadNotifications()->count(),
+            'unread_count' => $this->notificationRepository->unreadCount($user),
         ]);
     }
 
@@ -66,8 +67,7 @@ class NotificationController extends Controller
      */
     public function markAllAsRead(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $user->unreadNotifications->markAsRead();
+        $this->notificationRepository->markAllAsRead($request->user());
 
         return response()->json([
             'message' => 'All notifications marked as read',
@@ -76,19 +76,17 @@ class NotificationController extends Controller
     }
 
     /**
-     * Delete a specific notification.
+     * Delete a notification.
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
         $user = $request->user();
-        $notification = $user->notifications()->findOrFail($id);
-
-        $notification->delete();
+        $notification = $this->notificationRepository->findForUserOrFail($user, $id);
+        $this->notificationRepository->delete($notification);
 
         return response()->json([
             'message' => 'Notification deleted successfully',
-            'unread_count' => $user->unreadNotifications()->count(),
+            'unread_count' => $this->notificationRepository->unreadCount($user),
         ]);
     }
 }
-

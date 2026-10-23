@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\Board;
 use App\Models\Task;
 use App\Models\User;
+use App\Repositories\Contracts\ActivityLogRepositoryInterface;
 
 class ActivityLogger
 {
@@ -22,7 +23,7 @@ class ActivityLogger
     ): ActivityLog {
         $user = $user ?? auth()->user();
 
-        return ActivityLog::create([
+        return app(ActivityLogRepositoryInterface::class)->create([
             'workspace_id' => $board->workspace_id,
             'board_id' => $board->id,
             'task_id' => $task?->id,

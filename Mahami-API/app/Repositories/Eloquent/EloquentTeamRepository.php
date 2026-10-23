@@ -5,6 +5,9 @@ namespace App\Repositories\Eloquent;
 use App\Models\Team;
 use App\Repositories\Contracts\TeamRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Board;
+use App\Models\User;
+use App\Models\Workspace;
 
 class EloquentTeamRepository implements TeamRepositoryInterface
 {
@@ -75,5 +78,40 @@ class EloquentTeamRepository implements TeamRepositoryInterface
     {
         $team = Team::findOrFail($teamId);
         $team->boards()->detach($boardId);
+    }
+
+    public function findOrFail(int $id): Team
+    {
+        return Team::findOrFail($id);
+    }
+
+    public function getForBoard(Board $board): Collection
+    {
+        return $board->teams;
+    }
+
+    public function findBoardTeam(Board $board, int $teamId): ?Team
+    {
+        return $board->teams()->where('workspace_teams.id', $teamId)->first();
+    }
+
+    public function getMembers(Team $team): Collection
+    {
+        return $team->members;
+    }
+
+    public function findMember(Team $team, int $userId): ?User
+    {
+        return $team->members()->where('users.id', $userId)->first();
+    }
+
+    public function loadRelations(Team $team, array $relations): Team
+    {
+        return $team->load($relations);
+    }
+
+    public function getWorkspace(Team $team): Workspace
+    {
+        return $team->workspace;
     }
 }

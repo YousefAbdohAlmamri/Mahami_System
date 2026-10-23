@@ -38,5 +38,14 @@ interface WorkspaceInvitationRepositoryInterface
      * Cancel invitation.
      */
     public function cancel(WorkspaceInvitation $invitation): void;
-}
 
+    /**
+     * Cancel every still-pending invitation of an email in the workspace.
+     */
+    public function cancelPendingForEmail(Workspace $workspace, string $email): int;
+
+    /**
+     * Still-valid pending invitations for an email (workspace + inviter loaded).
+     */
+    public function pendingForEmail(string $email): Collection;
+}

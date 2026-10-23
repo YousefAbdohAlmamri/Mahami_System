@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
-use App\Models\User;
-use App\Models\WorkspaceInvitation;
 use App\Notifications\WorkspaceInvitationNotification;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\WorkspaceInvitationRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +16,17 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected UserRepositoryInterface $userRepository,
+        protected WorkspaceInvitationRepositoryInterface $invitationRepository
+    ) {}
+
     /**
      * Handle an incoming registration request.
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
+        $user = $this->userRepository->create([
             'name' => $request->validated('name'),
             'email' => $request->validated('email'),
             'password' => Hash::make($request->validated('password')),
@@ -30,13 +35,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // Check if there are pending invitations for this newly registered email
-        $pendingInvites = WorkspaceInvitation::where('email', strtolower($user->email))
-            ->whereNull('accepted_at')
-            ->whereNull('declined_at')
-            ->whereNull('cancelled_at')
-            ->where('expires_at', '>', now())
-            ->with(['workspace', 'inviter'])
-            ->get();
+        $pendingInvites = $this->invitationRepository->pendingForEmail($user->email);
 
         foreach ($pendingInvites as $invite) {
             if ($invite->workspace && $invite->inviter) {

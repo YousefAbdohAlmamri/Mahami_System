@@ -5,15 +5,22 @@ namespace App\Services;
 use App\Models\Board;
 use App\Models\Task;
 use App\Models\Workspace;
+use App\Repositories\Contracts\BoardRepositoryInterface;
+use App\Repositories\Contracts\WorkspaceRepositoryInterface;
 
 class AnalyticsService
 {
+    public function __construct(
+        protected BoardRepositoryInterface $boardRepository,
+        protected WorkspaceRepositoryInterface $workspaceRepository
+    ) {}
+
     /**
      * Calculate comprehensive analytics for a board.
      */
     public function getBoardAnalytics(Board $board): array
     {
-        $board->load(['lists.tasks.assignees', 'lists.tasks.checklists.items']);
+        $this->boardRepository->loadForAnalytics($board);
 
         $allTasks = collect();
         $statusBreakdown = [];
@@ -97,7 +104,7 @@ class AnalyticsService
      */
     public function getWorkspaceAnalytics(Workspace $workspace): array
     {
-        $boards = $workspace->boards()->with(['lists.tasks.assignees'])->get();
+        $boards = $this->workspaceRepository->getBoardsForAnalytics($workspace);
 
         $totalBoards = $boards->count();
         $totalTasks = 0;
@@ -137,7 +144,7 @@ class AnalyticsService
             'completed_tasks' => $completedTasks,
             'overall_completion_rate' => $overallCompletionRate,
             'overdue_tasks_count' => $overdueTasks,
-            'members_count' => $workspace->members()->count(),
+            'members_count' => $this->workspaceRepository->countMembers($workspace),
             'priority_breakdown' => $priorityTotals,
             'board_summaries' => $boardSummaries,
         ];

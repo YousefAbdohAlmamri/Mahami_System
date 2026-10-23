@@ -8,12 +8,20 @@ use App\Http\Resources\ChecklistResource;
 use App\Models\Task;
 use App\Models\TaskChecklist;
 use App\Models\TaskChecklistItem;
+use App\Repositories\Contracts\TaskChecklistRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class TaskChecklistController extends Controller
 {
+    public function __construct(
+        protected TaskChecklistRepositoryInterface $checklistRepository
+    ) {}
+
+    /**
+     * Create a checklist for a task.
+     */
     public function store(Request $request, Task $task): JsonResponse
     {
         Gate::authorize('update', $task);
@@ -22,19 +30,17 @@ class TaskChecklistController extends Controller
             'title' => ['required', 'string', 'max:255'],
         ]);
 
-        $maxPos = $task->checklists()->max('position') ?? -1;
-
-        $checklist = $task->checklists()->create([
-            'title' => $validated['title'],
-            'position' => $maxPos + 1,
-        ]);
+        $checklist = $this->checklistRepository->createChecklist($task, $validated['title']);
 
         return response()->json([
             'message' => 'Checklist created successfully.',
-            'data' => new ChecklistResource($checklist->load('items')),
+            'data' => new ChecklistResource($checklist),
         ], 201);
     }
 
+    /**
+     * Update a checklist.
+     */
     public function update(Request $request, TaskChecklist $checklist): JsonResponse
     {
         Gate::authorize('update', $checklist->task);
@@ -43,25 +49,31 @@ class TaskChecklistController extends Controller
             'title' => ['required', 'string', 'max:255'],
         ]);
 
-        $checklist->update($validated);
+        $checklist = $this->checklistRepository->updateChecklist($checklist, $validated);
 
         return response()->json([
             'message' => 'Checklist updated successfully.',
-            'data' => new ChecklistResource($checklist->load('items')),
+            'data' => new ChecklistResource($checklist),
         ]);
     }
 
+    /**
+     * Delete a checklist.
+     */
     public function destroy(TaskChecklist $checklist): JsonResponse
     {
         Gate::authorize('update', $checklist->task);
 
-        $checklist->delete();
+        $this->checklistRepository->deleteChecklist($checklist);
 
         return response()->json([
             'message' => 'Checklist deleted successfully.',
         ]);
     }
 
+    /**
+     * Add an item to a checklist.
+     */
     public function addItem(Request $request, TaskChecklist $checklist): JsonResponse
     {
         Gate::authorize('update', $checklist->task);
@@ -70,13 +82,7 @@ class TaskChecklistController extends Controller
             'title' => ['required', 'string', 'max:255'],
         ]);
 
-        $maxPos = $checklist->items()->max('position') ?? -1;
-
-        $item = $checklist->items()->create([
-            'title' => $validated['title'],
-            'is_completed' => false,
-            'position' => $maxPos + 1,
-        ]);
+        $item = $this->checklistRepository->addItem($checklist, $validated['title']);
 
         return response()->json([
             'message' => 'Checklist item added successfully.',
@@ -84,6 +90,9 @@ class TaskChecklistController extends Controller
         ], 201);
     }
 
+    /**
+     * Update a checklist item (title and/or completion state).
+     */
     public function updateItem(Request $request, TaskChecklistItem $item): JsonResponse
     {
         Gate::authorize('update', $item->checklist->task);
@@ -93,7 +102,7 @@ class TaskChecklistController extends Controller
             'is_completed' => ['sometimes', 'required', 'boolean'],
         ]);
 
-        $item->update($validated);
+        $item = $this->checklistRepository->updateItem($item, $validated);
 
         return response()->json([
             'message' => 'Checklist item updated successfully.',
@@ -101,15 +110,17 @@ class TaskChecklistController extends Controller
         ]);
     }
 
+    /**
+     * Delete a checklist item.
+     */
     public function destroyItem(TaskChecklistItem $item): JsonResponse
     {
         Gate::authorize('update', $item->checklist->task);
 
-        $item->delete();
+        $this->checklistRepository->deleteItem($item);
 
         return response()->json([
             'message' => 'Checklist item deleted successfully.',
         ]);
     }
 }
-

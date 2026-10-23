@@ -26,11 +26,7 @@ class WorkspaceMemberController extends Controller
     {
         Gate::authorize('view', $workspace);
 
-        $members = $workspace->members()
-            ->select('users.id', 'users.name', 'users.email')
-            ->withPivot('role', 'status', 'created_at')
-            ->orderBy('workspace_members.role')
-            ->get();
+        $members = $this->workspaceRepository->getMembers($workspace);
 
         return WorkspaceMemberResource::collection($members);
     }

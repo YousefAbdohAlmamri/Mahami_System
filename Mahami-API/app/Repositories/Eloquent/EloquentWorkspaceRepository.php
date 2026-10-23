@@ -117,5 +117,47 @@ class EloquentWorkspaceRepository implements WorkspaceRepositoryInterface
     {
         $workspace->members()->detach($user->id);
     }
-}
 
+    public function findOrFail(int $id): Workspace
+    {
+        return Workspace::findOrFail($id);
+    }
+
+    public function getMembers(Workspace $workspace): Collection
+    {
+        return $workspace->members()
+            ->select('users.id', 'users.name', 'users.email')
+            ->withPivot('role', 'status', 'created_at')
+            ->orderBy('workspace_members.role')
+            ->get();
+    }
+
+    public function countMembers(Workspace $workspace): int
+    {
+        return $workspace->members()->count();
+    }
+
+    public function hasMember(Workspace $workspace, int $userId): bool
+    {
+        return $workspace->members()->where('users.id', $userId)->exists();
+    }
+
+    public function isActiveMember(Workspace $workspace, int $userId): bool
+    {
+        return $workspace->members()
+            ->where('users.id', $userId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    public function isOwnerOrActiveMember(Workspace $workspace, int $userId): bool
+    {
+        return (int) $workspace->owner_id === $userId
+            || $this->isActiveMember($workspace, $userId);
+    }
+
+    public function getBoardsForAnalytics(Workspace $workspace): Collection
+    {
+        return $workspace->boards()->with(['lists.tasks.assignees'])->get();
+    }
+}

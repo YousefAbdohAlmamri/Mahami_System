@@ -4,20 +4,26 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ActivityLogResource;
-use App\Models\ActivityLog;
-use App\Models\Board;
-use App\Models\Task;
+use App\Repositories\Contracts\ActivityLogRepositoryInterface;
+use App\Repositories\Contracts\BoardRepositoryInterface;
+use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ActivityLogController extends Controller
 {
+    public function __construct(
+        protected ActivityLogRepositoryInterface $activityLogRepository,
+        protected TaskRepositoryInterface $taskRepository,
+        protected BoardRepositoryInterface $boardRepository
+    ) {}
+
     /**
-     * Get activity log for a specific task.
+     * Get the activity log for a specific task (latest 50).
      */
     public function taskActivities(Request $request, int $taskId): AnonymousResourceCollection
     {
-        $task = Task::with('list.board.workspace')->findOrFail($taskId);
+        $task = $this->taskRepository->findOrFailWithContext($taskId);
         $board = $task->list?->board;
 
         if (!$board) {
@@ -25,6 +31,7 @@ class ActivityLogController extends Controller
         }
 
         $user = $request->user();
+
         if ($board->user_id !== $user->id) {
             if ($board->workspace_id) {
                 if ($board->getUserPermission($user) === null) {
@@ -35,21 +42,17 @@ class ActivityLogController extends Controller
             }
         }
 
-        $activities = ActivityLog::where('task_id', $task->id)
-            ->with('user')
-            ->latest('created_at')
-            ->limit(50)
-            ->get();
+        $activities = $this->activityLogRepository->latestForTask((int) $task->id, 50);
 
         return ActivityLogResource::collection($activities);
     }
 
     /**
-     * Get recent activity logs for a whole board.
+     * Get the activity log for a board (latest 50).
      */
     public function boardActivities(Request $request, int $boardId): AnonymousResourceCollection
     {
-        $board = Board::with('workspace')->findOrFail($boardId);
+        $board = $this->boardRepository->findOrFailWithWorkspace($boardId);
         $user = $request->user();
 
         if ($board->user_id !== $user->id) {
@@ -62,13 +65,8 @@ class ActivityLogController extends Controller
             }
         }
 
-        $activities = ActivityLog::where('board_id', $board->id)
-            ->with('user')
-            ->latest('created_at')
-            ->limit(50)
-            ->get();
+        $activities = $this->activityLogRepository->latestForBoard((int) $board->id, 50);
 
         return ActivityLogResource::collection($activities);
     }
 }
-

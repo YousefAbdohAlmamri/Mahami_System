@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Task;
 use App\Notifications\TaskDueReminderNotification;
+use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Console\Command;
 
 class SendTaskDueReminders extends Command
@@ -25,14 +25,11 @@ class SendTaskDueReminders extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(TaskRepositoryInterface $taskRepository): int
     {
         $today = now()->format('Y-m-d');
 
-        $tasks = Task::whereNotNull('due_date')
-            ->where('due_date', '<=', $today)
-            ->with(['assignees', 'list.board'])
-            ->get();
+        $tasks = $taskRepository->getDueOnOrBefore($today);
 
         $notificationsSent = 0;
 

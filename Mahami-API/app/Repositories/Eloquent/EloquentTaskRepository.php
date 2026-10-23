@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class EloquentTaskRepository implements TaskRepositoryInterface
 {
@@ -122,5 +123,81 @@ class EloquentTaskRepository implements TaskRepositoryInterface
         $max = $this->model->where('board_list_id', $listId)->max('position');
         return is_null($max) ? 0 : (int) $max + 1;
     }
-}
 
+    public function findOrFailWithContext(int $id): Task
+    {
+        return $this->model
+            ->with('list.board.workspace')
+            ->findOrFail($id);
+    }
+
+    public function getForList(int $listId): Collection
+    {
+        return $this->model
+            ->where('board_list_id', $listId)
+            ->orderBy('position')
+            ->get();
+    }
+
+    public function countInList(int $listId, array $ids): int
+    {
+        return $this->model
+            ->where('board_list_id', $listId)
+            ->whereIn('id', $ids)
+            ->count();
+    }
+
+    public function getDueOnOrBefore(string $date): Collection
+    {
+        return $this->model
+            ->whereNotNull('due_date')
+            ->where('due_date', '<=', $date)
+            ->with(['assignees', 'list.board'])
+            ->get();
+    }
+
+    public function assigneeIds(Task $task): array
+    {
+        return $task->assignees()->pluck('users.id')->map(fn ($id) => (int) $id)->all();
+    }
+
+    public function getAssignees(Task $task): Collection
+    {
+        return $task->assignees;
+    }
+
+    public function syncAssignees(Task $task, array $userIds): void
+    {
+        $task->assignees()->sync($userIds);
+    }
+
+    public function addAssignee(Task $task, int $userId): void
+    {
+        $task->assignees()->syncWithoutDetaching([$userId]);
+    }
+
+    public function removeAssignee(Task $task, int $userId): void
+    {
+        $task->assignees()->detach($userId);
+    }
+
+    public function syncLabels(Task $task, array $labelIds): void
+    {
+        $task->labels()->sync($labelIds);
+    }
+
+    public function attachLabel(Task $task, int $labelId): void
+    {
+        $task->labels()->syncWithoutDetaching([$labelId]);
+    }
+
+    public function detachLabel(Task $task, int $labelId): void
+    {
+        $task->labels()->detach($labelId);
+    }
+
+    public function refreshWithDetails(Task $task): ?Task
+    {
+        return $task->fresh(['assignees', 'labels', 'checklists.items', 'attachments']);
+    }
+}

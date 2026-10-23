@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\LabelResource;
 use App\Models\Board;
 use App\Models\Label;
+use App\Repositories\Contracts\LabelRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -13,13 +14,23 @@ use Illuminate\Support\Facades\Gate;
 
 class LabelController extends Controller
 {
+    public function __construct(
+        protected LabelRepositoryInterface $labelRepository
+    ) {}
+
+    /**
+     * Get all labels for a board.
+     */
     public function index(Board $board): AnonymousResourceCollection
     {
         Gate::authorize('view', $board);
 
-        return LabelResource::collection($board->labels()->latest()->get());
+        return LabelResource::collection($this->labelRepository->forBoard($board));
     }
 
+    /**
+     * Create a new label for a board.
+     */
     public function store(Request $request, Board $board): JsonResponse
     {
         Gate::authorize('update', $board);
@@ -29,7 +40,7 @@ class LabelController extends Controller
             'color' => ['required', 'string', 'max:32'],
         ]);
 
-        $label = $board->labels()->create($validated);
+        $label = $this->labelRepository->create($board, $validated);
 
         return response()->json([
             'message' => 'Label created successfully.',
@@ -37,6 +48,9 @@ class LabelController extends Controller
         ], 201);
     }
 
+    /**
+     * Update a label.
+     */
     public function update(Request $request, Board $board, Label $label): JsonResponse
     {
         Gate::authorize('update', $board);
@@ -46,7 +60,7 @@ class LabelController extends Controller
             'color' => ['sometimes', 'required', 'string', 'max:32'],
         ]);
 
-        $label->update($validated);
+        $label = $this->labelRepository->update($label, $validated);
 
         return response()->json([
             'message' => 'Label updated successfully.',
@@ -54,15 +68,17 @@ class LabelController extends Controller
         ]);
     }
 
+    /**
+     * Delete a label.
+     */
     public function destroy(Board $board, Label $label): JsonResponse
     {
         Gate::authorize('update', $board);
 
-        $label->delete();
+        $this->labelRepository->delete($label);
 
         return response()->json([
             'message' => 'Label deleted successfully.',
         ]);
     }
 }
-

@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TaskCommentResource;
-use App\Models\Task;
 use App\Models\TaskComment;
-use App\Models\User;
 use App\Notifications\TaskCommentNotification;
+use App\Repositories\Contracts\TaskCommentRepositoryInterface;
+use App\Repositories\Contracts\TaskRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,25 +17,33 @@ use Illuminate\Support\Facades\Gate;
 
 class TaskCommentController extends Controller
 {
+    public function __construct(
+        protected TaskCommentRepositoryInterface $commentRepository,
+        protected TaskRepositoryInterface $taskRepository,
+        protected UserRepositoryInterface $userRepository
+    ) {}
+
     /**
      * Display a listing of comments for a task.
      */
     public function index(Request $request, int $taskId): AnonymousResourceCollection
     {
-        $task = Task::with('list.board.workspace')->findOrFail($taskId);
+        $task = $this->taskRepository->findOrFailWithContext($taskId);
+
         Gate::authorize('viewAny', [TaskComment::class, $task]);
 
-        $comments = $task->comments()->with('user')->oldest()->get();
+        $comments = $this->commentRepository->forTask($task);
 
         return TaskCommentResource::collection($comments);
     }
 
     /**
-     * Store a newly created comment for a task.
+     * Store a newly created comment in storage.
      */
     public function store(Request $request, int $taskId): JsonResponse
     {
-        $task = Task::with('list.board.workspace')->findOrFail($taskId);
+        $task = $this->taskRepository->findOrFailWithContext($taskId);
+
         Gate::authorize('create', [TaskComment::class, $task]);
 
         $validated = $request->validate([
@@ -42,11 +51,10 @@ class TaskCommentController extends Controller
         ]);
 
         $user = $request->user();
-        $comment = $task->comments()->create([
-            'user_id' => $user->id,
-            'content' => $validated['content'],
-        ]);
 
+        $comment = $this->commentRepository->create($task, (int) $user->id, $validated['content']);
+
+        // Log activity
         $board = $task->list->board;
         ActivityLogger::log(
             board: $board,
@@ -60,10 +68,11 @@ class TaskCommentController extends Controller
         // Notify mentions and assignees
         preg_match_all('/@([a-zA-Z0-9_\x{0621}-\x{064A}]+)/u', $comment->content, $matches);
         $mentionedNames = array_unique($matches[1] ?? []);
+
         $notifiedUserIds = [$user->id];
 
         if (!empty($mentionedNames)) {
-            $mentionedUsers = User::whereIn('name', $mentionedNames)->get();
+            $mentionedUsers = $this->userRepository->findByNames($mentionedNames);
             foreach ($mentionedUsers as $mUser) {
                 if ($mUser->id !== $user->id) {
                     $mUser->notify(new TaskCommentNotification($task, $comment, $user, isMention: true));
@@ -72,46 +81,46 @@ class TaskCommentController extends Controller
             }
         }
 
-        foreach ($task->assignees as $assignee) {
+        foreach ($this->taskRepository->getAssignees($task) as $assignee) {
             if (!in_array($assignee->id, $notifiedUserIds, true)) {
                 $assignee->notify(new TaskCommentNotification($task, $comment, $user, isMention: false));
                 $notifiedUserIds[] = $assignee->id;
             }
         }
 
-        return (new TaskCommentResource($comment->load('user')))
+        return (new TaskCommentResource($this->commentRepository->loadAuthor($comment)))
             ->response()
             ->setStatusCode(201);
     }
 
     /**
-     * Update the specified comment.
+     * Update the specified comment in storage.
      */
     public function update(Request $request, int $id): TaskCommentResource
     {
-        $comment = TaskComment::with('task.list.board.workspace')->findOrFail($id);
+        $comment = $this->commentRepository->findOrFailWithContext($id);
+
         Gate::authorize('update', $comment);
 
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:5000'],
         ]);
 
-        $comment->update([
-            'content' => $validated['content'],
-        ]);
+        $comment = $this->commentRepository->update($comment, $validated['content']);
 
-        return new TaskCommentResource($comment->load('user'));
+        return new TaskCommentResource($comment);
     }
 
     /**
-     * Remove the specified comment.
+     * Remove the specified comment from storage.
      */
     public function destroy(int $id): JsonResponse
     {
-        $comment = TaskComment::with('task.list.board.workspace')->findOrFail($id);
+        $comment = $this->commentRepository->findOrFailWithContext($id);
+
         Gate::authorize('delete', $comment);
 
-        $comment->delete();
+        $this->commentRepository->delete($comment);
 
         return response()->json([
             'message' => 'Comment deleted successfully',
