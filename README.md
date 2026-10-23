@@ -1,227 +1,365 @@
-# Mahami — Full-Stack Kanban Task Management
+<div align="center">Mahami | مهامي
 
-A modern, production-grade Kanban-based task and project management web application inspired by Trello. Built with **Laravel 12 REST API** (PHP 8.2), **MySQL**, **Repository Pattern**, **Sanctum Authentication**, and **Vue 3** (Vite, Pinia, Vue Router, Tailwind CSS v4, Sortablejs).
+Plan Together. Work Smarter. Get Things Done.
 
----
+A Modern Project & Team Management Platform
 
-## 🌟 Key Features
+Mahami is a collaborative project and team management platform designed to help individuals and teams organize projects, manage tasks, coordinate responsibilities, and track progress in one place.
 
-### 1. Authentication & Security
-- **Sanctum SPA & Token Auth**: Session/Bearer token authentication with protected routes.
-- **Form Request Validation**: Robust validation for registration, login, board, list, and task operations.
-- **Resource Authorization**: Granular Laravel Policies ensuring users only access and modify their own boards, columns, and tasks.
-- **Rate Limiting**: Built-in throttle protection against brute-force login attempts (5 requests/min).
-- **Cross-Board Move Protection**: Strict policy and database checks preventing moving cards between lists owned by different boards or users.
+Built with Laravel and Vue.js, Mahami brings together task management, Kanban boards, team collaboration, notifications, and a flexible user experience to make teamwork more organized and productive.
 
-### 2. Boards Management
-- Create, view, edit, and delete Kanban boards.
-- **Atomic Creation**: Automatically provisions three default columns (`To Do`, `In Progress`, `Done`) inside a single database transaction (`DB::transaction`).
-- Cascade deletions for lists and tasks upon board deletion.
+Arabic & English · RTL & LTR · Dark & Light Mode
 
-### 3. Lists / Columns Management
-- Create custom columns, update titles inline or via modal, and delete columns.
-- **Drag-and-Drop Reordering**: Column ordering powered by Sortablejs with continuous position indexing.
-- Real-time task count badge per column.
+"Laravel" (<https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white>)
+"PHP" (<https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white>)
+"Vue.js" (<https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white>)
+"MySQL" (<https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white>)
 
-### 4. Tasks Management & Drag-and-Drop
-- Create, edit, and delete tasks with priority (`low`, `medium`, `high`) and optional date-only due date (`YYYY-MM-DD`).
-- **Interactive Drag-and-Drop**:
-  - **Intra-column reordering**: Smooth reordering within the same list.
-  - **Inter-column movement**: Dragging cards across columns updates the parent list and position instantly.
-- Contiguous position compaction on deletion to eliminate index gaps.
-- Full task detail view modal with overdue date indicators and priority badges.
+</div>---
 
-### 5. UI Preferences & Localization
-- **Bi-directional Support**: Full **RTL** (Right-to-Left) and **LTR** (Left-to-Right) layout support with CSS logical properties.
-- **Bilingual Interface**: Native Arabic (**العربية**) and English (**English**) support without page reloads.
-- **Theming**: Dark Mode and Light Mode with instant toggle and `localStorage` persistence.
-- **Responsive Design**: Designed for desktop, tablet, and mobile screens.
+📌 Table of Contents
 
----
+- "About the Project" (#-about-the-project)
+- "Why Mahami?" (#-why-mahami)
+- "Key Features" (#-key-features)
+- "Technology Stack" (#-technology-stack)
+- "System Architecture" (#-system-architecture)
+- "Project Structure" (#-project-structure)
+- "Getting Started" (#-getting-started)
+- "Running Tests" (#-running-tests)
+- "Security" (#-security)
+- "Future Improvements" (#-future-improvements)
+- "License" (#-license)
 
-## 🏗️ Architecture & Design Patterns
+🚀 About the Project
 
-```
+Mahami (مهامي) is a full-stack project and team management application inspired by modern Kanban-based productivity tools.
+
+It provides a centralized workspace where users can organize projects, create teams, manage boards, assign tasks, collaborate with teammates, and monitor work progress.
+
+The system consists of two main applications:
+
+- Mahami API: A RESTful backend powered by Laravel.
+- Mahami Frontend: A responsive web application built with Vue.js.
+
+Mahami focuses on maintainable architecture, secure access control, modular development, and an intuitive user experience.
+
+💡 Why Mahami?
+
+Managing projects across multiple tools can make collaboration difficult and reduce visibility into team progress.
+
+Mahami aims to simplify teamwork by bringing essential project management capabilities into one organized platform.
+
+- Organize work: Manage projects, boards, lists, and tasks in one place.
+- Improve collaboration: Coordinate responsibilities and communicate with team members.
+- Track progress: Monitor task statuses, priorities, deadlines, and activity.
+- Manage access: Organize team participation and permissions.
+- Work comfortably: Switch between Arabic and English, RTL and LTR layouts, and dark and light themes.
+
+✨ Key Features
+
+📋 Project & Task Management
+
+- Create and manage Kanban boards.
+- Organize tasks into lists and cards.
+- Move tasks between lists using drag-and-drop interactions.
+- Assign tasks to team members.
+- Track priorities, deadlines, and task progress.
+- Organize tasks using labels and checklists.
+- Attach files and supporting documents to tasks.
+
+👥 Workspaces & Team Management
+
+- Create and manage workspaces.
+- Organize members and teams.
+- Manage team participation in projects and boards.
+- Assign responsibilities to team members.
+- Apply role-based permissions to protected resources.
+
+💬 Team Collaboration
+
+- Add comments to tasks.
+- Keep discussions connected to the relevant work.
+- Review task and project activity.
+- Notify team members about relevant updates.
+- Support collaboration workflows within shared workspaces.
+
+🔔 Notifications & Activity Tracking
+
+- Keep users informed about relevant changes.
+- Track important project and task activities.
+- Support background jobs and notification workflows where configured.
+- Improve visibility into team operations.
+
+🌐 Modern User Experience
+
+- Arabic and English language support.
+- Right-to-left (RTL) and left-to-right (LTR) layouts.
+- Dark and light themes.
+- Responsive layouts for desktop, tablet, and mobile screens.
+- Reusable Vue.js components and organized application state.
+
+🔐 Security & Maintainability
+
+- Laravel Sanctum authentication.
+- Server-side request validation.
+- Policy-based authorization and access control.
+- Repository Pattern for organizing data access.
+- Database migrations and structured data management.
+- Backend and frontend testing.
+
+Feature availability depends on the current implementation and environment configuration.
+
+🧰 Technology Stack
+
+Component| Technologies
+Backend| PHP 8.2+, Laravel 12
+API| RESTful JSON API
+Authentication| Laravel Sanctum
+Database| MySQL
+ORM| Laravel Eloquent
+Architecture| Repository Pattern, Policies, Form Requests
+Frontend| Vue.js 3, Composition API
+State Management| Pinia
+Routing| Vue Router
+Styling| Tailwind CSS
+Build Tool| Vite
+HTTP Client| Axios
+Drag & Drop| SortableJS
+Backend Testing| PHPUnit
+Frontend Testing| Vitest, Vue Test Utils
+
+🏗️ System Architecture
+
+Mahami separates the backend API from the frontend application to improve maintainability, testing, and independent development.
+
+                   MAHAMI SYSTEM
+                         |
+              +----------+----------+
+              |                     |
+       Mahami Frontend         Mahami API
+          Vue.js 3              Laravel 12
+              |                     |
+              |    RESTful API      |
+              +---------------------+
+                                    |
+                               Eloquent ORM
+                                    |
+                              MySQL Database
+
+Backend
+
+The Laravel backend provides API endpoints, authentication, validation, business logic, authorization, and database access.
+
+Its main architectural elements include:
+
+- Controllers for handling HTTP requests.
+- Form Requests for input validation.
+- Models for database entities.
+- Repositories for data access.
+- Policies for authorization.
+- API Resources for consistent API responses.
+- Application actions for focused business operations.
+
+Frontend
+
+The Vue.js frontend provides the interactive user interface and communicates with the backend through HTTP API requests.
+
+Its main elements include:
+
+- Reusable UI components.
+- Pages and layouts.
+- API services.
+- Pinia stores for state management.
+- Vue Router for navigation.
+- Shared composables and utilities.
+- Localization and theme management.
+
+📂 Project Structure
+
 Mahami_System/
-├── Mahami-API/                 # Laravel 12 Backend API
-│   ├── app/
-│   │   ├── Actions/Boards/     # Single-responsibility actions (CreateBoardAction)
-│   │   ├── Http/Controllers/Api # REST Controllers (Auth, Board, BoardList, Task)
-│   │   ├── Http/Requests/      # FormRequests with custom validation
-│   │   ├── Http/Resources/     # API Resource transformers
-│   │   ├── Models/             # Eloquent models (User, Board, BoardList, Task)
-│   │   ├── Policies/           # Authorization policies
-│   │   └── Repositories/       # Repository Pattern
-│   │       ├── Contracts/      # Interfaces (Board, BoardList, Task)
-│   │       └── Eloquent/       # Eloquent implementations
-│   └── tests/                  # Unit & Feature test suites (58 tests)
 │
-└── Mahami-Frontend/            # Vue 3 Single Page Application
-    ├── src/
-    │   ├── components/         # Reusable UI components
-    │   │   ├── boards/         # BoardCard, BoardForm
-    │   │   ├── common/         # AppButton, AppInput, AppModal, ConfirmDialog, etc.
-    │   │   ├── lists/          # BoardColumn, ColumnHeader, ColumnForm
-    │   │   └── tasks/          # TaskCard, TaskForm, TaskDetailsModal
-    │   ├── composables/        # useI18n, useToast
-    │   ├── i18n/               # Arabic and English translation dictionaries
-    │   ├── layouts/            # AuthLayout, MainLayout
-    │   ├── pages/              # LoginPage, RegisterPage, BoardsPage, BoardDetailsPage
-    │   ├── router/             # Vue Router with navigation guards
-    │   ├── services/           # Axios HTTP service layer
-    │   ├── stores/             # Pinia stores (auth, board, preferences, toast)
-    │   └── __tests__/          # Vitest test suite (14 tests)
-```
+├── Mahami-API/
+│ ├── app/
+│ │ ├── Actions/
+│ │ ├── Http/
+│ │ ├── Models/
+│ │ ├── Policies/
+│ │ └── Repositories/
+│ ├── database/
+│ ├── routes/
+│ ├── tests/
+│ ├── .env.example
+│ └── composer.json
+│
+└── Mahami-Frontend/
+├── src/
+│ ├── components/
+│ ├── composables/
+│ ├── i18n/
+│ ├── pages/
+│ ├── router/
+│ ├── services/
+│ ├── stores/
+│ └── **tests**/
+├── package.json
+└── vite.config.js
 
----
+The directory structure may vary depending on the current repository version.
 
-## 🚀 Getting Started
+⚙️ Getting Started
 
-### Prerequisites
-- **PHP** >= 8.2
-- **Composer** >= 2.0
-- **MySQL** >= 8.0
-- **Node.js** >= 18.0 & **npm**
+Follow these steps to run Mahami locally.
 
----
+Prerequisites
 
-### Backend Setup (Mahami-API)
+Install the following tools:
 
-1. Navigate to the API directory:
-   ```bash
-   cd Mahami-API
-   ```
+- PHP 8.2 or newer.
+- Composer.
+- MySQL 8.x or a compatible database.
+- Node.js and npm.
+- Git.
 
-2. Install PHP dependencies:
-   ```bash
-   composer install
-   ```
+1. Clone the Repository
 
-3. Configure environment:
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-   Ensure `.env` contains your MySQL credentials and Sanctum configuration:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=mini_trello
-   DB_USERNAME=root
-   DB_PASSWORD=
+git clone YOUR_REPOSITORY_URL
+cd Mahami_System
 
-   SANCTUM_STATEFUL_DOMAINS=localhost:5173,127.0.0.1:5173
-   SESSION_DOMAIN=localhost
-   ```
+Replace "YOUR_REPOSITORY_URL" with the actual URL of your GitHub repository.
 
-4. Run migrations and database seeder:
-   ```bash
-   php artisan migrate --seed
-   ```
+1. Set Up the Backend
 
-5. Start the backend server:
-   ```bash
-   php artisan serve
-   ```
-   The API will be available at `http://localhost:8000`.
+Navigate to the backend directory:
 
----
-
-### Frontend Setup (Mahami-Frontend)
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd Mahami-Frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Ensure `.env` is configured:
-   ```env
-   VITE_API_BASE_URL=http://localhost:8000
-   ```
-
-4. Run development server:
-   ```bash
-   npm run dev
-   ```
-   The frontend will be available at `http://localhost:5173`.
-
-5. Build for production:
-   ```bash
-   npm run build
-   ```
-
----
-
-## 🔑 Demo Credentials
-
-The database seeder provisions the following accounts:
-
-| Role | Email | Password |
-|---|---|---|
-| **Demo User** (contains populated boards) | `demo@example.com` | `password123` |
-| **Isolation Test User** | `other@example.com` | `password123` |
-
----
-
-## 🧪 Testing
-
-### Backend Tests (PHPUnit / Pest)
-Run all 58 backend unit and feature tests:
-```bash
 cd Mahami-API
-php artisan test
-```
 
-Test coverage includes:
-- `RepositoryPatternTest`: Dependency injection container bindings and contiguous position calculations.
-- `AuthTest`: Registration, login, throttling, logout, and token authentication.
-- `BoardApiTest`: CRUD, authorization policies, atomic column provisioning.
-- `BoardListApiTest`: Column operations, validation, cross-board reordering prevention.
-- `TaskApiTest`: Task lifecycle, inter-column move, contiguous compaction, cross-board denial.
-- `PolicyAuthorizationTest` & `DatabaseConstraintsTest`: Foreign keys and cascade verification.
+Install the PHP dependencies:
 
-### Frontend Tests (Vitest)
-Run all 14 frontend tests:
-```bash
+composer install
+
+Create the environment file.
+
+Windows:
+
+copy .env.example .env
+
+Linux / macOS:
+
+cp .env.example .env
+
+Generate the application key:
+
+php artisan key:generate
+
+Configure your database credentials and required environment variables in ".env".
+
+Run the database migrations:
+
+php artisan migrate
+
+Start the backend server:
+
+php artisan serve
+
+The default local address is:
+
+"<http://127.0.0.1:8000>"
+
+1. Set Up the Frontend
+
+Open another terminal from the repository root:
+
 cd Mahami-Frontend
-npm test
-```
 
-Test coverage includes:
-- Preferences store (theme and locale switching, persistence, RTL/LTR computation).
-- Toast notification queueing and auto-dismissal.
-- Custom i18n composable with parameter interpolation and fallback.
-- Common component rendering and interaction (`AppButton`, `AppInput`, `TaskCard`).
+Install the frontend dependencies:
+
+npm install
+
+Configure the API base URL using the environment variable expected by your frontend. For example, if it uses "VITE_API_BASE_URL", create a ".env" file containing:
+
+VITE_API_BASE_URL=<http://localhost:....>
+
+Start the frontend development server:
+
+npm run dev
+
+Vite will display the local frontend address in the terminal, commonly:
+
+"<http://localhost:....>"
+
+1. Authentication Configuration
+
+Depending on the authentication flow implemented in the application, Laravel Sanctum may require configuration for:
+
+- CORS settings.
+- Stateful frontend domains.
+- Session cookie domains.
+- API and frontend origins.
+- CSRF cookie handling.
+
+Configure these settings according to your local environment and deployment setup.
+
+🧪 Running Tests
+
+Backend Tests
+
+From the "Mahami-API" directory:
+
+php artisan test
+
+Frontend Tests
+
+From the "Mahami-Frontend" directory:
+
+npm test
+
+Build the Frontend for Production
+
+From the frontend directory:
+
+npm run build
+
+Run the relevant tests and production build before deploying changes.
+
+🔒 Security
+
+Security is an important part of Mahami's development.
+
+- Never commit ".env" files or application secrets.
+- Never publish database passwords, API tokens, or private credentials.
+- Keep dependencies updated.
+- Validate incoming data on the server.
+- Enforce authorization checks for protected resources.
+- Configure CORS, sessions, and cookies appropriately for production.
+- Review ".gitignore" before pushing changes to GitHub.
+
+If you discover a security vulnerability, avoid publishing sensitive exploit details in a public issue. Contact the project maintainer privately.
+
+🤝 Contributing
+
+Contributions, suggestions, and improvements are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Implement your changes.
+4. Run the relevant tests.
+5. Submit a pull request describing your changes.
+
+Please keep contributions focused and follow the existing project conventions.
+
+📄 License
+
+No license has been specified for this project yet.
+
+Until a license is added to the repository, users should not assume they have permission to redistribute, modify, or reuse the code. Add an appropriate "LICENSE" file when the licensing terms have been decided.
 
 ---
 
-## 📡 API Endpoints Summary
+<div align="center">Mahami — مهامي
 
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|---|
-| `POST` | `/api/auth/register` | Register new user | No |
-| `POST` | `/api/auth/login` | Login user & receive token | No |
-| `POST` | `/api/auth/logout` | Revoke current token | Yes |
-| `GET` | `/api/auth/me` | Fetch authenticated user profile | Yes |
-| `GET` | `/api/boards` | List user boards | Yes |
-| `POST` | `/api/boards` | Create board with default columns | Yes |
-| `GET` | `/api/boards/{board}` | Get board with lists & tasks | Yes |
-| `PUT` | `/api/boards/{board}` | Update board title/description | Yes |
-| `DELETE` | `/api/boards/{board}` | Delete board | Yes |
-| `POST` | `/api/boards/{board}/lists` | Add column to board | Yes |
-| `PUT` | `/api/lists/{list}` | Update column title | Yes |
-| `DELETE` | `/api/lists/{list}` | Delete column | Yes |
-| `POST` | `/api/boards/{board}/lists/reorder`| Reorder columns | Yes |
-| `POST` | `/api/lists/{list}/tasks` | Create task in column | Yes |
-| `GET` | `/api/tasks/{task}` | Get task details | Yes |
-| `PUT` | `/api/tasks/{task}` | Update task | Yes |
-| `DELETE` | `/api/tasks/{task}` | Delete task | Yes |
-| `POST` | `/api/tasks/{task}/move` | Move task to list and position | Yes |
-| `POST` | `/api/lists/{list}/tasks/reorder` | Reorder tasks in list | Yes |
+Bring your team's work together, one task at a time.
 
+Plan better. Collaborate smarter. Achieve more.
+
+</div>
