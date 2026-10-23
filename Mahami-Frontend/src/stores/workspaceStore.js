@@ -1,162 +1,203 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import workspaceService from '@/services/workspaceService'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import workspaceService from "@/services/workspaceService";
 
-export const useWorkspaceStore = defineStore('workspace', () => {
-  const workspaces = ref([])
+const ALL_MODE_KEY = "mahami_all_workspaces";
+
+export const useWorkspaceStore = defineStore("workspace", () => {
+  const workspaces = ref([]);
+  // "All Workspaces" mode is remembered explicitly so a refresh (or any re-fetch
+  // of the workspaces list) does not silently jump back to the first workspace.
+  const isAllMode = ref(localStorage.getItem(ALL_MODE_KEY) === "1");
   const currentWorkspaceId = ref(
-    localStorage.getItem('mahami_active_workspace')
-      ? Number(localStorage.getItem('mahami_active_workspace')) || localStorage.getItem('mahami_active_workspace')
-      : null
-  )
-  const members = ref([])
-  const isLoading = ref(false)
-  const isMembersLoading = ref(false)
-  const error = ref(null)
+    !isAllMode.value && localStorage.getItem("mahami_active_workspace")
+      ? Number(localStorage.getItem("mahami_active_workspace")) ||
+          localStorage.getItem("mahami_active_workspace")
+      : null,
+  );
+  const members = ref([]);
+  const isLoading = ref(false);
+  const isMembersLoading = ref(false);
+  const error = ref(null);
 
   const currentWorkspace = computed(() => {
-    if (!currentWorkspaceId.value) return null
-    return workspaces.value.find((w) => String(w.id) === String(currentWorkspaceId.value)) || null
-  })
+    if (!currentWorkspaceId.value) return null;
+    return (
+      workspaces.value.find(
+        (w) => String(w.id) === String(currentWorkspaceId.value),
+      ) || null
+    );
+  });
 
   const currentUserRole = computed(() => {
-    return currentWorkspace.value?.current_user_role || null
-  })
+    return currentWorkspace.value?.current_user_role || null;
+  });
 
-  const isOwner = computed(() => currentUserRole.value === 'owner')
-  const isAdmin = computed(() => currentUserRole.value === 'admin')
-  const canManageMembers = computed(() => isOwner.value || isAdmin.value)
-  const canEditWorkspace = computed(() => isOwner.value || isAdmin.value)
-  const canDeleteWorkspace = computed(() => isOwner.value)
-  const canCreateBoard = computed(() => currentUserRole.value !== 'guest')
+  const isOwner = computed(() => currentUserRole.value === "owner");
+  const isAdmin = computed(() => currentUserRole.value === "admin");
+  const canManageMembers = computed(() => isOwner.value || isAdmin.value);
+  const canEditWorkspace = computed(() => isOwner.value || isAdmin.value);
+  const canDeleteWorkspace = computed(() => isOwner.value);
+  const canCreateBoard = computed(() => currentUserRole.value !== "guest");
+
+  // Workspaces where the current user is allowed to create boards (not a guest)
+  const creatableWorkspaces = computed(() =>
+    workspaces.value.filter((w) => w.current_user_role !== "guest"),
+  );
 
   async function fetchWorkspaces() {
-    isLoading.value = true
-    error.value = null
+    isLoading.value = true;
+    error.value = null;
     try {
-      const response = await workspaceService.getWorkspaces()
-      workspaces.value = response.data || []
+      const response = await workspaceService.getWorkspaces();
+      workspaces.value = response.data || [];
 
       // If active workspace is null or invalid, pick the first one available
-      if (workspaces.value.length > 0) {
-        const exists = workspaces.value.some((w) => String(w.id) === String(currentWorkspaceId.value))
+      // (unless the user deliberately chose "All Workspaces")
+      if (workspaces.value.length > 0 && isAllMode.value) {
+        currentWorkspaceId.value = null;
+      } else if (workspaces.value.length > 0) {
+        const exists = workspaces.value.some(
+          (w) => String(w.id) === String(currentWorkspaceId.value),
+        );
         if (!exists) {
-          setActiveWorkspace(workspaces.value[0].id)
+          setActiveWorkspace(workspaces.value[0].id);
         }
       } else {
-        currentWorkspaceId.value = null
-        localStorage.removeItem('mahami_active_workspace')
+        currentWorkspaceId.value = null;
+        localStorage.removeItem("mahami_active_workspace");
       }
 
-      return workspaces.value
+      return workspaces.value;
     } catch (err) {
-      error.value = err.response?.data?.message || err.message
-      throw err
+      error.value = err.response?.data?.message || err.message;
+      throw err;
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
 
   function setActiveWorkspace(id) {
-    if (id === null || id === undefined || id === '') {
-      currentWorkspaceId.value = null
-      localStorage.removeItem('mahami_active_workspace')
-      members.value = []
-      return
+    if (id === null || id === undefined || id === "") {
+      currentWorkspaceId.value = null;
+      isAllMode.value = true;
+      localStorage.removeItem("mahami_active_workspace");
+      localStorage.setItem(ALL_MODE_KEY, "1");
+      members.value = [];
+      return;
     }
 
-    currentWorkspaceId.value = Number(id) || id
-    localStorage.setItem('mahami_active_workspace', String(currentWorkspaceId.value))
+    isAllMode.value = false;
+    localStorage.removeItem(ALL_MODE_KEY);
+    currentWorkspaceId.value = Number(id) || id;
+    localStorage.setItem(
+      "mahami_active_workspace",
+      String(currentWorkspaceId.value),
+    );
   }
 
   async function createWorkspace(data) {
-    const response = await workspaceService.createWorkspace(data)
-    const newWs = response.data
-    workspaces.value.unshift(newWs)
-    setActiveWorkspace(newWs.id)
-    return newWs
+    const response = await workspaceService.createWorkspace(data);
+    const newWs = response.data;
+    workspaces.value.unshift(newWs);
+    setActiveWorkspace(newWs.id);
+    return newWs;
   }
 
   async function updateWorkspace(id, data) {
-    const response = await workspaceService.updateWorkspace(id, data)
-    const updated = response.data
-    const index = workspaces.value.findIndex((w) => String(w.id) === String(id))
+    const response = await workspaceService.updateWorkspace(id, data);
+    const updated = response.data;
+    const index = workspaces.value.findIndex(
+      (w) => String(w.id) === String(id),
+    );
     if (index !== -1) {
-      workspaces.value[index] = { ...workspaces.value[index], ...updated }
+      workspaces.value[index] = { ...workspaces.value[index], ...updated };
     }
-    return updated
+    return updated;
   }
 
   async function deleteWorkspace(id) {
-    await workspaceService.deleteWorkspace(id)
-    workspaces.value = workspaces.value.filter((w) => String(w.id) !== String(id))
+    await workspaceService.deleteWorkspace(id);
+    workspaces.value = workspaces.value.filter(
+      (w) => String(w.id) !== String(id),
+    );
 
     if (String(currentWorkspaceId.value) === String(id)) {
       if (workspaces.value.length > 0) {
-        setActiveWorkspace(workspaces.value[0].id)
+        setActiveWorkspace(workspaces.value[0].id);
       } else {
-        setActiveWorkspace(null)
+        setActiveWorkspace(null);
       }
     }
   }
 
   async function fetchMembers(workspaceId = null) {
-    const targetId = workspaceId || currentWorkspaceId.value
+    const targetId = workspaceId || currentWorkspaceId.value;
     if (!targetId) {
-      members.value = []
-      return []
+      members.value = [];
+      return [];
     }
 
-    isMembersLoading.value = true
+    isMembersLoading.value = true;
     try {
-      const response = await workspaceService.getMembers(targetId)
-      members.value = response.data || []
-      return members.value
+      const response = await workspaceService.getMembers(targetId);
+      members.value = response.data || [];
+      return members.value;
     } finally {
-      isMembersLoading.value = false
+      isMembersLoading.value = false;
     }
   }
 
   async function inviteMember(workspaceId, data) {
-    const targetId = workspaceId || currentWorkspaceId.value
-    const response = await workspaceService.inviteMember(targetId, data)
-    return response
+    const targetId = workspaceId || currentWorkspaceId.value;
+    const response = await workspaceService.inviteMember(targetId, data);
+    return response;
   }
 
   async function updateMemberRole(workspaceId, userId, role) {
-    const targetId = workspaceId || currentWorkspaceId.value
-    const response = await workspaceService.updateMemberRole(targetId, userId, { role })
-    const updated = response.data
-    const idx = members.value.findIndex((m) => String(m.id) === String(userId))
+    const targetId = workspaceId || currentWorkspaceId.value;
+    const response = await workspaceService.updateMemberRole(targetId, userId, {
+      role,
+    });
+    const updated = response.data;
+    const idx = members.value.findIndex((m) => String(m.id) === String(userId));
     if (idx !== -1) {
-      members.value[idx] = { ...members.value[idx], ...updated }
+      members.value[idx] = { ...members.value[idx], ...updated };
     }
-    return updated
+    return updated;
   }
 
   async function removeMember(workspaceId, userId) {
-    const targetId = workspaceId || currentWorkspaceId.value
-    await workspaceService.removeMember(targetId, userId)
-    members.value = members.value.filter((m) => String(m.id) !== String(userId))
+    const targetId = workspaceId || currentWorkspaceId.value;
+    await workspaceService.removeMember(targetId, userId);
+    members.value = members.value.filter(
+      (m) => String(m.id) !== String(userId),
+    );
   }
 
   async function transferOwnership(workspaceId, newOwnerId) {
-    const targetId = workspaceId || currentWorkspaceId.value
-    const response = await workspaceService.transferOwnership(targetId, { new_owner_id: newOwnerId })
-    await fetchWorkspaces()
-    return response.data
+    const targetId = workspaceId || currentWorkspaceId.value;
+    const response = await workspaceService.transferOwnership(targetId, {
+      new_owner_id: newOwnerId,
+    });
+    await fetchWorkspaces();
+    return response.data;
   }
 
   function reset() {
-    workspaces.value = []
-    currentWorkspaceId.value = null
-    members.value = []
-    error.value = null
-    localStorage.removeItem('mahami_active_workspace')
+    workspaces.value = [];
+    currentWorkspaceId.value = null;
+    isAllMode.value = false;
+    members.value = [];
+    error.value = null;
+    localStorage.removeItem("mahami_active_workspace");
+    localStorage.removeItem(ALL_MODE_KEY);
   }
 
   return {
     workspaces,
+    isAllMode,
+    creatableWorkspaces,
     currentWorkspaceId,
     currentWorkspace,
     members,
@@ -181,6 +222,5 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     removeMember,
     transferOwnership,
     reset,
-  }
-})
-
+  };
+});
