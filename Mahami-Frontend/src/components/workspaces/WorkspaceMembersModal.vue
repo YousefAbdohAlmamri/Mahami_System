@@ -1,132 +1,139 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { useWorkspaceStore } from '@/stores/workspaceStore'
-import { useAuthStore } from '@/stores/authStore'
-import { useI18n } from '@/composables/useI18n'
-import { useToast } from '@/composables/useToast'
-import AppModal from '@/components/common/AppModal.vue'
-import AppInput from '@/components/common/AppInput.vue'
-import AppButton from '@/components/common/AppButton.vue'
-import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
-import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
+import { ref, reactive, computed, onMounted } from "vue";
+import { useWorkspaceStore } from "@/stores/workspaceStore";
+import { useAuthStore } from "@/stores/authStore";
+import { useI18n } from "@/composables/useI18n";
+import { useToast } from "@/composables/useToast";
+import AppModal from "@/components/common/AppModal.vue";
+import AppInput from "@/components/common/AppInput.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue";
+import LoadingIndicator from "@/components/common/LoadingIndicator.vue";
 
 const props = defineProps({
   workspace: {
     type: Object,
     required: true,
   },
-})
+});
 
-const emit = defineEmits(['close'])
-const { t } = useI18n()
-const toast = useToast()
-const workspaceStore = useWorkspaceStore()
-const authStore = useAuthStore()
+const emit = defineEmits(["close"]);
+const { t } = useI18n();
+const toast = useToast();
+const workspaceStore = useWorkspaceStore();
+const authStore = useAuthStore();
 
 const inviteForm = reactive({
-  email: '',
-  role: 'member',
-})
-const inviteLoading = ref(false)
-const lastInviteLink = ref('')
-const memberToRemove = ref(null)
-const showRemoveConfirm = ref(false)
-const removeLoading = ref(false)
+  email: "",
+  role: "member",
+});
+const inviteLoading = ref(false);
+const lastInviteLink = ref("");
+const memberToRemove = ref(null);
+const showRemoveConfirm = ref(false);
+const removeLoading = ref(false);
 
 const roleOptions = [
-  { value: 'admin', labelKey: 'roleAdmin', descKey: 'roleAdminDesc' },
-  { value: 'member', labelKey: 'roleMember', descKey: 'roleMemberDesc' },
-  { value: 'guest', labelKey: 'roleGuest', descKey: 'roleGuestDesc' },
-]
+  { value: "admin", labelKey: "roleAdmin", descKey: "roleAdminDesc" },
+  { value: "member", labelKey: "roleMember", descKey: "roleMemberDesc" },
+  { value: "guest", labelKey: "roleGuest", descKey: "roleGuestDesc" },
+];
 
 const canManage = computed(() => {
-  return workspaceStore.canManageMembers
-})
+  return workspaceStore.canManageMembers;
+});
 
 const isOwner = computed(() => {
-  return workspaceStore.isOwner
-})
+  return workspaceStore.isOwner;
+});
 
 onMounted(async () => {
   try {
-    await workspaceStore.fetchMembers(props.workspace.id)
+    await workspaceStore.fetchMembers(props.workspace.id);
   } catch (err) {
-    toast.error(err.response?.data?.message || t('networkError'))
+    toast.error(err.response?.data?.message || t("networkError"));
   }
-})
+});
 
 async function handleInvite() {
-  if (!inviteForm.email.trim()) return
-  inviteLoading.value = true
-  lastInviteLink.value = ''
+  if (!inviteForm.email.trim()) return;
+  inviteLoading.value = true;
+  lastInviteLink.value = "";
   try {
     const res = await workspaceStore.inviteMember(props.workspace.id, {
       email: inviteForm.email.trim(),
       role: inviteForm.role,
-    })
-    toast.success(t('invitationSent'))
-    const token = res?.data?.token || res?.token || res?.invitation?.token
+    });
+    toast.success(t("invitationSent"));
+    const token = res?.data?.token || res?.token || res?.invitation?.token;
     if (token) {
-      lastInviteLink.value = `${window.location.origin}/invitations/${token}`
+      lastInviteLink.value = `${window.location.origin}/invitations/${token}`;
     }
-    inviteForm.email = ''
+    inviteForm.email = "";
   } catch (err) {
-    toast.error(err.response?.data?.message || t('genericError'))
+    toast.error(err.response?.data?.message || t("genericError"));
   } finally {
-    inviteLoading.value = false
+    inviteLoading.value = false;
   }
 }
 
 async function copyInviteLink() {
-  if (!lastInviteLink.value) return
+  if (!lastInviteLink.value) return;
   try {
-    await navigator.clipboard.writeText(lastInviteLink.value)
-    toast.success(t('linkCopied'))
+    await navigator.clipboard.writeText(lastInviteLink.value);
+    toast.success(t("linkCopied"));
   } catch {
-    toast.error(t('genericError'))
+    toast.error(t("genericError"));
   }
 }
 
 async function handleRoleChange(member, newRole) {
   try {
-    await workspaceStore.updateMemberRole(props.workspace.id, member.id, newRole)
-    toast.success(t('roleUpdated'))
+    await workspaceStore.updateMemberRole(
+      props.workspace.id,
+      member.id,
+      newRole,
+    );
+    toast.success(t("roleUpdated"));
   } catch (err) {
-    toast.error(err.response?.data?.message || t('genericError'))
-    await workspaceStore.fetchMembers(props.workspace.id)
+    toast.error(err.response?.data?.message || t("genericError"));
+    await workspaceStore.fetchMembers(props.workspace.id);
   }
 }
 
 function promptRemoveMember(member) {
-  memberToRemove.value = member
-  showRemoveConfirm.value = true
+  memberToRemove.value = member;
+  showRemoveConfirm.value = true;
 }
 
 async function handleConfirmRemove() {
-  if (!memberToRemove.value) return
-  removeLoading.value = true
+  if (!memberToRemove.value) return;
+  removeLoading.value = true;
   try {
-    await workspaceStore.removeMember(props.workspace.id, memberToRemove.value.id)
-    toast.success(t('memberRemoved'))
-    showRemoveConfirm.value = false
-    memberToRemove.value = null
+    await workspaceStore.removeMember(
+      props.workspace.id,
+      memberToRemove.value.id,
+    );
+    toast.success(t("memberRemoved"));
+    showRemoveConfirm.value = false;
+    memberToRemove.value = null;
   } catch (err) {
-    toast.error(err.response?.data?.message || t('genericError'))
+    toast.error(err.response?.data?.message || t("genericError"));
   } finally {
-    removeLoading.value = false
+    removeLoading.value = false;
   }
 }
 
 function getRoleBadgeClass(role) {
   switch (role) {
-    case 'owner':
-      return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800/40'
-    case 'admin':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800/40'
-    case 'member':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800/40'
+    case "owner":
+      return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800/40";
+    case "admin":
+      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800/40";
+    case "member":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800/40";
     default:
-      return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+      return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700";
   }
 }
 </script>
@@ -139,12 +146,20 @@ function getRoleBadgeClass(role) {
   >
     <div class="space-y-6">
       <!-- ── Invite Section (Only for Owner / Admin) ─────────────────── -->
-      <div v-if="canManage" class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-          {{ t('inviteMember') }}
+      <div
+        v-if="canManage"
+        class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3"
+      >
+        <h4
+          class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+        >
+          {{ t("inviteMember") }}
         </h4>
 
-        <form @submit.prevent="handleInvite" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+        <form
+          @submit.prevent="handleInvite"
+          class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end"
+        >
           <div class="sm:col-span-7">
             <AppInput
               v-model="inviteForm.email"
@@ -156,14 +171,20 @@ function getRoleBadgeClass(role) {
           </div>
 
           <div class="sm:col-span-3">
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              {{ t('role') }}
+            <label
+              class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+            >
+              {{ t("role") }}
             </label>
             <select
               v-model="inviteForm.role"
               class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
-              <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">
+              <option
+                v-for="opt in roleOptions"
+                :key="opt.value"
+                :value="opt.value"
+              >
                 {{ t(opt.labelKey) }}
               </option>
             </select>
@@ -176,14 +197,20 @@ function getRoleBadgeClass(role) {
               :loading="inviteLoading"
               class="w-full justify-center"
             >
-              {{ t('sendInvitation') }}
+              {{ t("sendInvitation") }}
             </AppButton>
           </div>
         </form>
 
         <!-- Generated invite link -->
-        <div v-if="lastInviteLink" class="mt-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 flex items-center justify-between gap-3 text-xs">
-          <div class="flex-1 truncate font-mono text-blue-700 dark:text-blue-300">
+        <div
+          v-if="lastInviteLink"
+          class="mt-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 flex flex-col min-[420px]:flex-row min-[420px]:items-center justify-between gap-2 sm:gap-3 text-xs min-w-0"
+        >
+          <div
+            class="flex-1 min-w-0 truncate font-mono text-blue-700 dark:text-blue-300"
+            dir="ltr"
+          >
             {{ lastInviteLink }}
           </div>
           <button
@@ -191,7 +218,7 @@ function getRoleBadgeClass(role) {
             class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-colors"
             @click="copyInviteLink"
           >
-            {{ t('copyLink') }}
+            {{ t("copyLink") }}
           </button>
         </div>
       </div>
@@ -199,29 +226,41 @@ function getRoleBadgeClass(role) {
       <!-- ── Members List ────────────────────────────────────────────── -->
       <div class="space-y-3">
         <div class="flex items-center justify-between">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-            {{ t('members') }} ({{ workspaceStore.members.length }})
+          <h4
+            class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+          >
+            {{ t("members") }} ({{ workspaceStore.members.length }})
           </h4>
         </div>
 
-        <div v-if="workspaceStore.isMembersLoading" class="py-8 flex justify-center">
+        <div
+          v-if="workspaceStore.isMembersLoading"
+          class="py-8 flex justify-center"
+        >
           <LoadingIndicator />
         </div>
 
-        <div v-else class="divide-y divide-slate-100 dark:divide-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden bg-white dark:bg-slate-800/30">
+        <div
+          v-else
+          class="divide-y divide-slate-100 dark:divide-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden bg-white dark:bg-slate-800/30"
+        >
           <div
             v-for="member in workspaceStore.members"
             :key="member.id"
-            class="p-3.5 flex items-center justify-between gap-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+            class="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
           >
             <!-- User info -->
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 shadow-2xs">
-                {{ member.name?.charAt(0) || 'U' }}
+            <div class="flex items-center gap-3 min-w-0 sm:flex-1">
+              <div
+                class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0 shadow-2xs"
+              >
+                {{ member.name?.charAt(0) || "U" }}
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                  <span
+                    class="text-sm font-semibold text-slate-900 dark:text-white truncate"
+                  >
                     {{ member.name }}
                   </span>
                   <span
@@ -231,21 +270,25 @@ function getRoleBadgeClass(role) {
                     (You)
                   </span>
                 </div>
-                <div class="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <div
+                  class="text-xs text-slate-500 dark:text-slate-400 truncate"
+                >
                   {{ member.email }}
                 </div>
               </div>
             </div>
 
             <!-- Role & Actions -->
-            <div class="flex items-center gap-2 shrink-0">
+            <div
+              class="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end"
+            >
               <!-- If owner -->
               <span
                 v-if="member.role === 'owner'"
                 class="px-2.5 py-1 text-xs font-semibold rounded-lg border"
                 :class="getRoleBadgeClass(member.role)"
               >
-                {{ t('roleOwner') }}
+                {{ t("roleOwner") }}
               </span>
 
               <!-- If non-owner and user can manage -->
@@ -255,7 +298,11 @@ function getRoleBadgeClass(role) {
                   class="px-2 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   @change="handleRoleChange(member, $event.target.value)"
                 >
-                  <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">
+                  <option
+                    v-for="opt in roleOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
                     {{ t(opt.labelKey) }}
                   </option>
                 </select>
@@ -267,8 +314,17 @@ function getRoleBadgeClass(role) {
                   :title="t('removeMember')"
                   @click="promptRemoveMember(member)"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
                     <line x1="10" y1="11" x2="10" y2="17" />
                     <line x1="14" y1="11" x2="14" y2="17" />
                   </svg>
@@ -281,7 +337,13 @@ function getRoleBadgeClass(role) {
                 class="px-2.5 py-1 text-xs font-semibold rounded-lg border"
                 :class="getRoleBadgeClass(member.role)"
               >
-                {{ t('role' + member.role.charAt(0).toUpperCase() + member.role.slice(1)) }}
+                {{
+                  t(
+                    "role" +
+                      member.role.charAt(0).toUpperCase() +
+                      member.role.slice(1),
+                  )
+                }}
               </span>
             </div>
           </div>
@@ -289,9 +351,11 @@ function getRoleBadgeClass(role) {
       </div>
 
       <!-- Close footer -->
-      <div class="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div
+        class="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800"
+      >
         <AppButton variant="secondary" @click="emit('close')">
-          {{ t('close') }}
+          {{ t("close") }}
         </AppButton>
       </div>
     </div>
@@ -306,8 +370,10 @@ function getRoleBadgeClass(role) {
       :loading="removeLoading"
       variant="danger"
       @confirm="handleConfirmRemove"
-      @cancel="showRemoveConfirm = false; memberToRemove = null"
+      @cancel="
+        showRemoveConfirm = false;
+        memberToRemove = null;
+      "
     />
   </AppModal>
 </template>
-

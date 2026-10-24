@@ -25,7 +25,7 @@ const columnsCount = computed(() => {
 
 <template>
   <div
-    class="group relative flex flex-col justify-between p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-400/80 dark:hover:border-blue-500/60 hover:-translate-y-1 transition-all duration-200 overflow-hidden"
+    class="group relative flex flex-col justify-between min-w-0 p-4 sm:p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-400/80 dark:hover:border-blue-500/60 hover:-translate-y-1 transition-all duration-200 overflow-hidden"
   >
     <!-- Top decorative accent line -->
     <div

@@ -130,8 +130,18 @@ export default {
   personalBoards: "Personal Boards",
   personalBoardsHint: "Boards that are not part of any workspace",
   switchToWorkspace: "Open workspace",
+
+  // Workspace selection in the board creation form
   boardWorkspace: "Workspace",
+  boardWorkspaceHint:
+    "Choose where this board should live. You can change your selection before creating it.",
+  optional: "Optional",
+  searchWorkspaces: "Search workspaces...",
+  workspaceBoardDestination: "The board will be saved here",
+  personalBoardDestination: "Not linked to a workspace",
+  noWorkspaceSearchResults: "No workspace found with that name",
   noWorkspacePersonal: "No workspace (personal board)",
+
   boardsInGroup: "{count} boards",
   searchBoards: "Search boards...",
   noSearchResults: "No matching boards",

@@ -15,6 +15,25 @@ const emit = defineEmits(["close"]);
 
 const modalEl = ref(null);
 
+// Lock page scroll while any modal is open (counter supports stacked modals)
+function lockScroll() {
+  const n = Number(document.body.dataset.modalCount || 0) + 1;
+  document.body.dataset.modalCount = String(n);
+  if (n === 1) {
+    document.body.dataset.prevOverflow = document.body.style.overflow || "";
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function unlockScroll() {
+  const n = Math.max(0, Number(document.body.dataset.modalCount || 0) - 1);
+  document.body.dataset.modalCount = String(n);
+  if (n === 0) {
+    document.body.style.overflow = document.body.dataset.prevOverflow || "";
+    delete document.body.dataset.prevOverflow;
+  }
+}
+
 const sizeClasses = {
   sm: "max-w-sm",
   md: "max-w-md",
@@ -33,16 +52,22 @@ function onKeydown(e) {
 
 onMounted(async () => {
   document.addEventListener("keydown", onKeydown);
+  lockScroll();
   await nextTick();
-  // Focus first focusable element inside modal
-  const first = modalEl.value?.querySelector(
-    "input, textarea, select, button:not([data-close])",
-  );
-  first?.focus();
+  // Auto-focus the first field on desktop only – on phones it would pop the
+  // keyboard open immediately and cover half of the sheet.
+  const isTouch = window.matchMedia?.("(pointer: coarse)").matches;
+  if (!isTouch) {
+    const first = modalEl.value?.querySelector(
+      "input, textarea, select, button:not([data-close])",
+    );
+    first?.focus();
+  }
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("keydown", onKeydown);
+  unlockScroll();
 });
 </script>
 
@@ -50,7 +75,7 @@ onBeforeUnmount(() => {
   <teleport to="body">
     <!-- Backdrop & Modal Container -->
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto overscroll-contain"
       role="dialog"
       aria-modal="true"
     >
@@ -74,18 +99,18 @@ onBeforeUnmount(() => {
       <transition
         appear
         enter-active-class="transition-all duration-200 ease-out"
-        enter-from-class="opacity-0 scale-95 translate-y-2 sm:translate-y-0"
+        enter-from-class="opacity-0 sm:scale-95 translate-y-10 sm:translate-y-0"
         enter-to-class="opacity-100 scale-100 translate-y-0"
         leave-active-class="transition-all duration-150 ease-in"
         leave-from-class="opacity-100 scale-100 translate-y-0"
-        leave-to-class="opacity-0 scale-95 translate-y-2 sm:translate-y-0"
+        leave-to-class="opacity-0 sm:scale-95 translate-y-10 sm:translate-y-0"
       >
         <div
           ref="modalEl"
           :class="[
-            'relative w-full bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl z-10',
+            'relative w-full bg-white dark:bg-slate-800 rounded-t-3xl rounded-b-none sm:rounded-3xl shadow-2xl z-10',
             'border border-slate-200/80 dark:border-slate-700',
-            'flex flex-col max-h-[92vh] sm:max-h-[90vh]',
+            'flex flex-col max-h-[92dvh] sm:max-h-[90dvh]',
             sizeClasses[size],
           ]"
         >
@@ -96,7 +121,7 @@ onBeforeUnmount(() => {
           >
             <slot name="header">
               <h2
-                class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight"
+                class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight min-w-0 pe-3 line-clamp-2 break-words"
               >
                 {{ title }}
               </h2>
@@ -120,14 +145,16 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Body -->
-          <div class="overflow-y-auto flex-1 px-4 sm:px-6 py-5">
+          <div
+            class="overflow-y-auto overscroll-contain flex-1 min-h-0 px-4 sm:px-6 py-4 sm:py-5"
+          >
             <slot />
           </div>
 
           <!-- Footer -->
           <div
             v-if="$slots.footer"
-            class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-b-2xl sm:rounded-b-3xl shrink-0"
+            class="px-4 sm:px-6 py-3.5 sm:py-4 border-t border-slate-100 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-900/40 sm:rounded-b-3xl shrink-0"
           >
             <slot name="footer" />
           </div>

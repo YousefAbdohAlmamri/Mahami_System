@@ -625,7 +625,7 @@ async function handleDeleteComment(commentId) {
 
       <!-- ── Tabs ───────────────────────────────────────────────── -->
       <div
-        class="flex items-center gap-1 border-b border-slate-200 dark:border-slate-700/80 overflow-x-auto"
+        class="flex items-center gap-1 border-b border-slate-200 dark:border-slate-700/80 overflow-x-auto overscroll-x-contain -mx-1 px-1"
         role="tablist"
       >
         <button
@@ -703,7 +703,7 @@ async function handleDeleteComment(commentId) {
       <!-- ══ TAB 1: DETAILS ════════════════════════════════════════ -->
       <div
         v-if="activeTab === 'details'"
-        class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_17rem] gap-6"
+        class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_17rem] gap-5 sm:gap-6"
       >
         <!-- Main column -->
         <div class="space-y-7 min-w-0">
@@ -1459,7 +1459,7 @@ async function handleDeleteComment(commentId) {
 
               <div
                 v-if="showMentionDropdown"
-                class="absolute start-0 bottom-full mb-1 w-56 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-20 space-y-0.5 max-h-44 overflow-y-auto"
+                class="absolute start-0 bottom-full mb-1 w-56 max-w-[calc(100vw-3rem)] rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-20 space-y-0.5 max-h-44 overflow-y-auto"
               >
                 <button
                   v-for="u in availableAssignees"
@@ -1504,7 +1504,10 @@ async function handleDeleteComment(commentId) {
         >
           {{ t("noComments") }}
         </div>
-        <div v-else class="space-y-3 max-h-96 overflow-y-auto pe-1">
+        <div
+          v-else
+          class="space-y-3 max-h-[50dvh] sm:max-h-96 overflow-y-auto overscroll-contain pe-1"
+        >
           <div
             v-for="comment in comments"
             :key="comment.id"
@@ -1634,7 +1637,7 @@ async function handleDeleteComment(commentId) {
         </div>
         <div
           v-else
-          class="relative border-s-2 border-slate-200 dark:border-slate-700 ms-3 space-y-3 max-h-96 overflow-y-auto pe-1"
+          class="relative border-s-2 border-slate-200 dark:border-slate-700 ms-3 space-y-3 max-h-[50dvh] sm:max-h-96 overflow-y-auto overscroll-contain pe-1"
         >
           <div v-for="act in activities" :key="act.id" class="relative ps-5">
             <div

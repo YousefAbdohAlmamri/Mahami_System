@@ -128,8 +128,18 @@ export default {
   personalBoards: "اللوحات الشخصية",
   personalBoardsHint: "لوحات غير تابعة لأي مساحة عمل",
   switchToWorkspace: "فتح مساحة العمل",
+
+  // نصوص اختيار مساحة العمل الجديدة
   boardWorkspace: "مساحة العمل",
+  boardWorkspaceHint:
+    "اختر أين تريد حفظ هذه اللوحة. يمكنك تغيير اختيارك قبل الإنشاء.",
+  optional: "اختياري",
+  searchWorkspaces: "ابحث عن مساحة عمل...",
+  workspaceBoardDestination: "ستُحفظ اللوحة في هذه المساحة",
+  personalBoardDestination: "لن تكون مرتبطة بمساحة عمل",
+  noWorkspaceSearchResults: "لم يتم العثور على مساحة عمل بهذا الاسم",
   noWorkspacePersonal: "بدون مساحة عمل (لوحة شخصية)",
+
   boardsInGroup: "{count} لوحات",
   searchBoards: "ابحث في اللوحات...",
   noSearchResults: "لا توجد لوحات مطابقة",

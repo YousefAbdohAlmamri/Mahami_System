@@ -153,8 +153,10 @@ async function handleDeleteBoard() {
 </script>
 
 <template>
-  <div class="h-full overflow-y-auto px-4 sm:px-8 py-8">
-    <div class="max-w-6xl mx-auto space-y-6">
+  <div
+    class="h-full overflow-y-auto overscroll-contain px-3 sm:px-8 py-4 sm:py-8"
+  >
+    <div class="max-w-6xl mx-auto space-y-4 sm:space-y-6">
       <!-- ── All Workspaces Summary Banner ───────────────────── -->
       <div
         v-if="isAllMode && workspaceStore.workspaces.length > 0"
@@ -219,10 +221,10 @@ async function handleDeleteBoard() {
         v-if="workspaceStore.currentWorkspace"
         class="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/80 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
-        <div class="space-y-1">
-          <div class="flex items-center gap-2.5">
+        <div class="space-y-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <h2
-              class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white"
+              class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white break-words min-w-0"
             >
               {{ workspaceStore.currentWorkspace.name }}
             </h2>
@@ -247,7 +249,9 @@ async function handleDeleteBoard() {
           </p>
         </div>
 
-        <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+        <div
+          class="flex flex-wrap items-center gap-2 self-start sm:self-auto sm:shrink-0"
+        >
           <span
             class="text-xs text-slate-500 dark:text-slate-400 font-medium me-1"
           >
@@ -287,7 +291,7 @@ async function handleDeleteBoard() {
       <div
         class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2"
       >
-        <div>
+        <div class="min-w-0">
           <div class="flex items-center gap-3">
             <h1
               class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight"
@@ -478,7 +482,9 @@ async function handleDeleteBoard() {
             </button>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          >
             <BoardCard
               v-for="board in group.boards"
               :key="board.id"
@@ -491,7 +497,10 @@ async function handleDeleteBoard() {
       </div>
 
       <!-- Board Cards Grid -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+      >
         <BoardCard
           v-for="board in filteredBoards"
           :key="board.id"
